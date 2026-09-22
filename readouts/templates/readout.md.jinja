@@ -139,10 +139,12 @@ First sequential rejection day: {{ sequential.get('first_rejection_day') or 'non
 {% if sequential.get('points') %}
 {% set last = sequential.points[-1] %}
 
-| Final day | Method | Effect | Interval | p-value |
+| Final day | Method | Effect | Current interval | p-value |
 | ---: | --- | ---: | --- | ---: |
-| {{ last.day }} | Sequential monitor | {{ last.estimate|number }} | [{{ last.ci_low|number }}, {{ last.ci_high|number }}] | {{ last.p_value|pvalue }} |
+| {{ last.day }} | Sequential monitor, running-min p | {{ last.estimate|number }} | [{{ last.ci_low|number }}, {{ last.ci_high|number }}] | {{ last.p_value|pvalue }} |
 | {{ last.day }} | Naive daily comparison | {{ last.estimate|number }} | [{{ last.naive_low|number }}, {{ last.naive_high|number }}] | {{ last.naive_p_value|pvalue }} |
+
+The sequential p-value retains the strongest evidence from any earlier look. The displayed band is the current, un-intersected interval, so it can include zero after an earlier sequential rejection. The naive p-value uses only the current look.
 {% endif %}
 {% else %}
 Sequential monitoring not applicable: {{ sequential.get('reason', 'No valid observation timestamps were supplied.') }}
