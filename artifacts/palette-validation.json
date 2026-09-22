@@ -1,0 +1,744 @@
+{
+  "standard": "WCAG 2.2 relative luminance plus original cityflow OKLab and CVD validator",
+  "source": {
+    "repository": "cityflow",
+    "commit": "2163b362d75458e8485f3f78fdec85b7322e6fd7",
+    "ported_file": "scripts/palette_core.cjs"
+  },
+  "method": "Control and treatment hues are fixed by the requested design. Treatment uses the accent token for body text. Status always includes an icon and label. Dashed lines, hollow markers, direct labels and table views redundantly encode series. There is no diverging ramp.",
+  "palettes": {
+    "dark": {
+      "surface": "#0B0F14",
+      "panel": "#10171F",
+      "text": "#FAFAFA",
+      "muted": "#96A3B4",
+      "control": "#94A3B8",
+      "treatment": "#0891B2",
+      "accent": "#50D5EF",
+      "positive": "#60BDA5",
+      "warn": "#E9B567",
+      "danger": "#F28C8C"
+    },
+    "light": {
+      "surface": "#FAFAFA",
+      "panel": "#FFFFFF",
+      "text": "#111C29",
+      "muted": "#58687D",
+      "control": "#475569",
+      "treatment": "#0891B2",
+      "accent": "#08758E",
+      "positive": "#237761",
+      "warn": "#925B14",
+      "danger": "#B53D43"
+    }
+  },
+  "checks": [
+    {
+      "mode": "dark",
+      "foreground": "text",
+      "background": "surface",
+      "ratio": 18.413,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "muted",
+      "background": "surface",
+      "ratio": 7.5,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "accent",
+      "background": "surface",
+      "ratio": 11.079,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "positive",
+      "background": "surface",
+      "ratio": 8.529,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "warn",
+      "background": "surface",
+      "ratio": 10.314,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "danger",
+      "background": "surface",
+      "ratio": 8.15,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "control",
+      "background": "surface",
+      "role": "graphical mark",
+      "ratio": 7.496,
+      "threshold": 3,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "treatment",
+      "background": "surface",
+      "role": "graphical mark",
+      "ratio": 5.22,
+      "threshold": 3,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "text",
+      "background": "panel",
+      "ratio": 17.279,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "muted",
+      "background": "panel",
+      "ratio": 7.038,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "accent",
+      "background": "panel",
+      "ratio": 10.396,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "positive",
+      "background": "panel",
+      "ratio": 8.004,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "warn",
+      "background": "panel",
+      "ratio": 9.679,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "danger",
+      "background": "panel",
+      "ratio": 7.648,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "control",
+      "background": "panel",
+      "role": "graphical mark",
+      "ratio": 7.034,
+      "threshold": 3,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "foreground": "treatment",
+      "background": "panel",
+      "role": "graphical mark",
+      "ratio": 4.898,
+      "threshold": 3,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "text",
+      "background": "surface",
+      "ratio": 16.465,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "muted",
+      "background": "surface",
+      "ratio": 5.451,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "accent",
+      "background": "surface",
+      "ratio": 5.099,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "positive",
+      "background": "surface",
+      "ratio": 5.182,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "warn",
+      "background": "surface",
+      "ratio": 5.396,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "danger",
+      "background": "surface",
+      "ratio": 5.418,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "control",
+      "background": "surface",
+      "role": "graphical mark",
+      "ratio": 7.26,
+      "threshold": 3,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "treatment",
+      "background": "surface",
+      "role": "graphical mark",
+      "ratio": 3.528,
+      "threshold": 3,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "text",
+      "background": "panel",
+      "ratio": 17.186,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "muted",
+      "background": "panel",
+      "ratio": 5.689,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "accent",
+      "background": "panel",
+      "ratio": 5.323,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "positive",
+      "background": "panel",
+      "ratio": 5.408,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "warn",
+      "background": "panel",
+      "ratio": 5.632,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "danger",
+      "background": "panel",
+      "ratio": 5.655,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "control",
+      "background": "panel",
+      "role": "graphical mark",
+      "ratio": 7.578,
+      "threshold": 3,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "foreground": "treatment",
+      "background": "panel",
+      "role": "graphical mark",
+      "ratio": 3.682,
+      "threshold": 3,
+      "pass": true
+    },
+    {
+      "mode": "both",
+      "foreground": "#061820",
+      "background": "#0891B2",
+      "role": "button label",
+      "ratio": 4.92,
+      "threshold": 4.5,
+      "pass": true
+    }
+  ],
+  "upstream": [
+    {
+      "mode": "dark",
+      "surface": "#0B0F14",
+      "failures": 1,
+      "rows": [
+        {
+          "check": "contrast vs surface",
+          "subject": "#94A3B8",
+          "value": 7.5,
+          "floor": 3,
+          "pass": true,
+          "extra": "L 0.711 C 0.035"
+        },
+        {
+          "check": "contrast vs surface",
+          "subject": "#0891B2",
+          "value": 5.22,
+          "floor": 3,
+          "pass": true,
+          "extra": "L 0.609 C 0.111"
+        },
+        {
+          "check": "contrast vs surface",
+          "subject": "#D97706",
+          "value": 6.03,
+          "floor": 3,
+          "pass": true,
+          "extra": "L 0.666 C 0.157"
+        },
+        {
+          "check": "lightness or chroma separation",
+          "subject": "#94A3B8 to #0891B2",
+          "value": 0.102,
+          "floor": 0.045,
+          "pass": true,
+          "extra": "chroma delta 0.076"
+        },
+        {
+          "check": "normal vision delta E",
+          "subject": "#94A3B8 to #0891B2",
+          "value": 13.2,
+          "floor": 12,
+          "pass": true,
+          "extra": ""
+        },
+        {
+          "check": "worst colour vision deficiency delta E",
+          "subject": "#94A3B8 to #0891B2",
+          "value": 7.7,
+          "floor": 8,
+          "pass": false,
+          "extra": "protanopia"
+        },
+        {
+          "check": "lightness or chroma separation",
+          "subject": "#94A3B8 to #D97706",
+          "value": 0.045,
+          "floor": 0.045,
+          "pass": true,
+          "extra": "chroma delta 0.122"
+        },
+        {
+          "check": "normal vision delta E",
+          "subject": "#94A3B8 to #D97706",
+          "value": 19.6,
+          "floor": 12,
+          "pass": true,
+          "extra": ""
+        },
+        {
+          "check": "worst colour vision deficiency delta E",
+          "subject": "#94A3B8 to #D97706",
+          "value": 18.7,
+          "floor": 8,
+          "pass": true,
+          "extra": "tritanopia"
+        },
+        {
+          "check": "lightness or chroma separation",
+          "subject": "#0891B2 to #D97706",
+          "value": 0.057,
+          "floor": 0.045,
+          "pass": true,
+          "extra": "chroma delta 0.046"
+        },
+        {
+          "check": "normal vision delta E",
+          "subject": "#0891B2 to #D97706",
+          "value": 27.2,
+          "floor": 12,
+          "pass": true,
+          "extra": ""
+        },
+        {
+          "check": "worst colour vision deficiency delta E",
+          "subject": "#0891B2 to #D97706",
+          "value": 19.2,
+          "floor": 8,
+          "pass": true,
+          "extra": "protanopia"
+        }
+      ],
+      "surface_role": "surface",
+      "raw_exit_code": 1
+    },
+    {
+      "mode": "dark",
+      "surface": "#10171F",
+      "failures": 1,
+      "rows": [
+        {
+          "check": "contrast vs surface",
+          "subject": "#94A3B8",
+          "value": 7.03,
+          "floor": 3,
+          "pass": true,
+          "extra": "L 0.711 C 0.035"
+        },
+        {
+          "check": "contrast vs surface",
+          "subject": "#0891B2",
+          "value": 4.9,
+          "floor": 3,
+          "pass": true,
+          "extra": "L 0.609 C 0.111"
+        },
+        {
+          "check": "contrast vs surface",
+          "subject": "#D97706",
+          "value": 5.66,
+          "floor": 3,
+          "pass": true,
+          "extra": "L 0.666 C 0.157"
+        },
+        {
+          "check": "lightness or chroma separation",
+          "subject": "#94A3B8 to #0891B2",
+          "value": 0.102,
+          "floor": 0.045,
+          "pass": true,
+          "extra": "chroma delta 0.076"
+        },
+        {
+          "check": "normal vision delta E",
+          "subject": "#94A3B8 to #0891B2",
+          "value": 13.2,
+          "floor": 12,
+          "pass": true,
+          "extra": ""
+        },
+        {
+          "check": "worst colour vision deficiency delta E",
+          "subject": "#94A3B8 to #0891B2",
+          "value": 7.7,
+          "floor": 8,
+          "pass": false,
+          "extra": "protanopia"
+        },
+        {
+          "check": "lightness or chroma separation",
+          "subject": "#94A3B8 to #D97706",
+          "value": 0.045,
+          "floor": 0.045,
+          "pass": true,
+          "extra": "chroma delta 0.122"
+        },
+        {
+          "check": "normal vision delta E",
+          "subject": "#94A3B8 to #D97706",
+          "value": 19.6,
+          "floor": 12,
+          "pass": true,
+          "extra": ""
+        },
+        {
+          "check": "worst colour vision deficiency delta E",
+          "subject": "#94A3B8 to #D97706",
+          "value": 18.7,
+          "floor": 8,
+          "pass": true,
+          "extra": "tritanopia"
+        },
+        {
+          "check": "lightness or chroma separation",
+          "subject": "#0891B2 to #D97706",
+          "value": 0.057,
+          "floor": 0.045,
+          "pass": true,
+          "extra": "chroma delta 0.046"
+        },
+        {
+          "check": "normal vision delta E",
+          "subject": "#0891B2 to #D97706",
+          "value": 27.2,
+          "floor": 12,
+          "pass": true,
+          "extra": ""
+        },
+        {
+          "check": "worst colour vision deficiency delta E",
+          "subject": "#0891B2 to #D97706",
+          "value": 19.2,
+          "floor": 8,
+          "pass": true,
+          "extra": "protanopia"
+        }
+      ],
+      "surface_role": "panel",
+      "raw_exit_code": 1
+    },
+    {
+      "mode": "light",
+      "surface": "#FAFAFA",
+      "failures": 0,
+      "rows": [
+        {
+          "check": "contrast vs surface",
+          "subject": "#475569",
+          "value": 7.26,
+          "floor": 3,
+          "pass": true,
+          "extra": "L 0.446 C 0.037"
+        },
+        {
+          "check": "contrast vs surface",
+          "subject": "#0891B2",
+          "value": 3.53,
+          "floor": 3,
+          "pass": true,
+          "extra": "L 0.609 C 0.111"
+        },
+        {
+          "check": "contrast vs surface",
+          "subject": "#D97706",
+          "value": 3.05,
+          "floor": 3,
+          "pass": true,
+          "extra": "L 0.666 C 0.157"
+        },
+        {
+          "check": "lightness or chroma separation",
+          "subject": "#475569 to #0891B2",
+          "value": 0.163,
+          "floor": 0.045,
+          "pass": true,
+          "extra": "chroma delta 0.073"
+        },
+        {
+          "check": "normal vision delta E",
+          "subject": "#475569 to #0891B2",
+          "value": 18.3,
+          "floor": 12,
+          "pass": true,
+          "extra": ""
+        },
+        {
+          "check": "worst colour vision deficiency delta E",
+          "subject": "#475569 to #0891B2",
+          "value": 16.8,
+          "floor": 8,
+          "pass": true,
+          "extra": "deuteranopia"
+        },
+        {
+          "check": "lightness or chroma separation",
+          "subject": "#475569 to #D97706",
+          "value": 0.22,
+          "floor": 0.045,
+          "pass": true,
+          "extra": "chroma delta 0.120"
+        },
+        {
+          "check": "normal vision delta E",
+          "subject": "#475569 to #D97706",
+          "value": 29.3,
+          "floor": 12,
+          "pass": true,
+          "extra": ""
+        },
+        {
+          "check": "worst colour vision deficiency delta E",
+          "subject": "#475569 to #D97706",
+          "value": 22.2,
+          "floor": 8,
+          "pass": true,
+          "extra": "protanopia"
+        },
+        {
+          "check": "lightness or chroma separation",
+          "subject": "#0891B2 to #D97706",
+          "value": 0.057,
+          "floor": 0.045,
+          "pass": true,
+          "extra": "chroma delta 0.046"
+        },
+        {
+          "check": "normal vision delta E",
+          "subject": "#0891B2 to #D97706",
+          "value": 27.2,
+          "floor": 12,
+          "pass": true,
+          "extra": ""
+        },
+        {
+          "check": "worst colour vision deficiency delta E",
+          "subject": "#0891B2 to #D97706",
+          "value": 19.2,
+          "floor": 8,
+          "pass": true,
+          "extra": "protanopia"
+        }
+      ],
+      "surface_role": "surface",
+      "raw_exit_code": 0
+    },
+    {
+      "mode": "light",
+      "surface": "#FFFFFF",
+      "failures": 0,
+      "rows": [
+        {
+          "check": "contrast vs surface",
+          "subject": "#475569",
+          "value": 7.58,
+          "floor": 3,
+          "pass": true,
+          "extra": "L 0.446 C 0.037"
+        },
+        {
+          "check": "contrast vs surface",
+          "subject": "#0891B2",
+          "value": 3.68,
+          "floor": 3,
+          "pass": true,
+          "extra": "L 0.609 C 0.111"
+        },
+        {
+          "check": "contrast vs surface",
+          "subject": "#D97706",
+          "value": 3.19,
+          "floor": 3,
+          "pass": true,
+          "extra": "L 0.666 C 0.157"
+        },
+        {
+          "check": "lightness or chroma separation",
+          "subject": "#475569 to #0891B2",
+          "value": 0.163,
+          "floor": 0.045,
+          "pass": true,
+          "extra": "chroma delta 0.073"
+        },
+        {
+          "check": "normal vision delta E",
+          "subject": "#475569 to #0891B2",
+          "value": 18.3,
+          "floor": 12,
+          "pass": true,
+          "extra": ""
+        },
+        {
+          "check": "worst colour vision deficiency delta E",
+          "subject": "#475569 to #0891B2",
+          "value": 16.8,
+          "floor": 8,
+          "pass": true,
+          "extra": "deuteranopia"
+        },
+        {
+          "check": "lightness or chroma separation",
+          "subject": "#475569 to #D97706",
+          "value": 0.22,
+          "floor": 0.045,
+          "pass": true,
+          "extra": "chroma delta 0.120"
+        },
+        {
+          "check": "normal vision delta E",
+          "subject": "#475569 to #D97706",
+          "value": 29.3,
+          "floor": 12,
+          "pass": true,
+          "extra": ""
+        },
+        {
+          "check": "worst colour vision deficiency delta E",
+          "subject": "#475569 to #D97706",
+          "value": 22.2,
+          "floor": 8,
+          "pass": true,
+          "extra": "protanopia"
+        },
+        {
+          "check": "lightness or chroma separation",
+          "subject": "#0891B2 to #D97706",
+          "value": 0.057,
+          "floor": 0.045,
+          "pass": true,
+          "extra": "chroma delta 0.046"
+        },
+        {
+          "check": "normal vision delta E",
+          "subject": "#0891B2 to #D97706",
+          "value": 27.2,
+          "floor": 12,
+          "pass": true,
+          "extra": ""
+        },
+        {
+          "check": "worst colour vision deficiency delta E",
+          "subject": "#0891B2 to #D97706",
+          "value": 19.2,
+          "floor": 8,
+          "pass": true,
+          "extra": "protanopia"
+        }
+      ],
+      "surface_role": "panel",
+      "raw_exit_code": 0
+    }
+  ],
+  "known_mandated_conflict": "The requested dark control #94A3B8 and treatment #0891B2 have worst CVD delta E 7.7 under protanopia, below the inherited floor of 8. The failure is retained; hues are not silently changed. The third series #D97706 passes all pairwise checks in both modes.",
+  "pass": false,
+  "redundant_encodings": {
+    "dashed_lines": true,
+    "hollow_markers": true,
+    "named_legend": true,
+    "table_toggle": true
+  },
+  "exception_policy": "Only the exact fixed dark control/treatment protanopia separation result is eligible, on both declared surfaces, with line pattern, hollow mark, labels and table encodings present. Any other failure rejects validation.",
+  "known_exception_verified": true,
+  "validation_accepted": true,
+  "exception_explicitly_allowed": true
+}
