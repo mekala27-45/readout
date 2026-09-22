@@ -1,0 +1,138 @@
+# {{ experiment.name }}
+
+Source: **{{ experiment.source }}**. {{ experiment.get('source_detail', {}).get('description', '') }}
+
+Analysis recorded: {{ run.ran_at }}. Input fingerprint: `{{ run.get('inputs_hash', 'unavailable') }}`.
+
+## Health
+
+The conventional SRM threshold produces a warning; the stricter platform threshold blocks analysis. Both outcomes remain visible. A warning permits analysis with a qualification.
+
+| Check | Status | Statistic | p-value | Details |
+| --- | --- | ---: | ---: | --- |
+{% for check in health %}
+| {{ check.kind }} | {{ check.status }} | {{ check.get('statistic')|number }} | {{ check.get('p_value')|number(6) }} | {{ check.get('detail', {})|tojson }} |
+{% endfor %}
+
+## Design
+
+{{ experiment.get('hypothesis', design.get('hypothesis', '')) }}
+
+Frozen design hash: `{{ experiment.get('design_hash', 'unavailable') }}`.
+
+{% if experiment.source in ['public', 'uploaded'] %}
+This is a retrospective reconstruction registered before this platform's analysis. It is not evidence of historical pre-registration by the experiment's original team.
+{% endif %}
+{% if experiment.get('design_deviations') %}
+**PROTOCOL DEVIATION:** {{ experiment.design_deviations|tojson }}
+The analysis remains tied to the original registered design; subsequent changes are disclosed.
+{% else %}
+No changes to the registered design were recorded.
+{% endif %}
+
+```json
+{{ design|json }}
+```
+
+{% if not blocked %}
+## Primary metric
+
+{% set primary = results.get('primary') or {} %}
+| Metric | Absolute effect and interval | Relative effect and interval | p-value | Control units | Treatment units |
+| --- | --- | --- | ---: | ---: | ---: |
+| {{ primary.get('name', primary.get('key', 'unavailable')) }} | {{ primary|interval }} | {{ primary|interval(true) }} | {{ primary.get('p_value')|number(6) }} | {{ primary.get('n_control') }} | {{ primary.get('n_treatment') }} |
+
+Registered relative MDE: {{ design.get('mde_relative')|percent }}. Planned sample per arm: {{ design.get('planned_n_per_arm') }}. Design alpha: {{ design.get('alpha')|percent }}. Requested power: {{ design.get('power')|percent }}.
+
+{% if primary.get('bootstrap') %}
+Bootstrap cross-check: {{ primary.bootstrap|tojson }}.
+{% elif results.get('bootstrap') %}
+Bootstrap cross-check: {{ results.bootstrap|tojson }}.
+{% endif %}
+{% if primary.get('unadjusted') %}
+Without the declared outlier policy: {{ primary.unadjusted|interval }}.
+{% endif %}
+
+## Guardrails
+
+| Metric | Absolute effect and interval | Non-inferiority margin | Verdict |
+| --- | --- | ---: | --- |
+{% for metric in results.get('guardrails', []) %}
+| {{ metric.get('name', metric.get('key')) }} | {{ metric|interval }} | {{ metric.get('margin', metric.get('margin_relative')) }} | {{ 'pass' if metric.get('passed') else 'fail' }} |
+{% if metric.get('unwinsorized') %}
+| {{ metric.get('name', metric.get('key')) }} without winsorization | {{ metric.unwinsorized|interval }} | sensitivity row | descriptive |
+{% endif %}
+{% endfor %}
+
+{% if not results.get('guardrails') %}
+No guardrails were registered for this scenario.
+{% endif %}
+
+## Variance
+
+{% set cuped = results.get('cuped', {}) %}
+{% if cuped.get('applicable') %}
+{{ cuped|tojson }}
+{% else %}
+CUPED not applicable: {{ cuped.get('reason', 'No pre-period covariate was supplied.') }}
+{% endif %}
+
+## Sequential
+
+{% set sequential = results.get('sequential', {}) %}
+{% if sequential.get('applicable') %}
+Normal-mixture mSPRT with estimated variance. This is an asymptotic approximation; calibration supports only the simulated regimes that were measured. Mixing variance: {{ design.get('mixing_variance') }}.
+
+First sequential rejection day: {{ sequential.get('first_rejection_day', 'none') }}.
+{% if sequential.get('points') %}
+Final monitor state: {{ sequential.points[-1]|tojson }}
+{% endif %}
+{% else %}
+Sequential monitoring not applicable: {{ sequential.get('reason', 'No valid observation timestamps were supplied.') }}
+{% endif %}
+
+## Secondary and segments
+
+These are exploratory comparisons. Adjusted p-values are Benjamini-Hochberg corrections within the declared comparison family. Pointwise intervals are not simultaneous confidence intervals.
+
+| Comparison | Effect and interval | Raw p-value | Adjusted p-value | Raw verdict | Corrected verdict |
+| --- | --- | ---: | ---: | --- | --- |
+{% for metric in results.get('secondary', []) + results.get('segments', []) %}
+| {{ metric.get('name', metric.get('key', metric.get('segment', 'comparison'))) }} | {{ metric|interval }} | {{ metric.get('p_value')|number(6) }} | {{ metric.get('q_value', metric.get('adjusted_p_value'))|number(6) }} | {{ metric.get('significant', metric.get('uncorrected_significant')) }} | {{ metric.get('significant_adjusted', metric.get('corrected_significant')) }} |
+{% endfor %}
+{% else %}
+Analysis stopped at the health gate. No metric results were produced.
+{% endif %}
+
+## Decision
+
+**{{ decision.get('decision', results.get('decision', {}).get('decision', 'blocked'))|upper }}**
+
+{{ results.get('decision', {}).get('reason', decision.get('reason', '')) }}
+
+Registered rule:
+
+> {{ design.get('decision_rule', {}).get('text', results.get('decision', {}).get('rule', 'No registered rule available.')) }}
+
+{% if results.get('decision', {}).get('additional_n_per_arm') %}
+Additional sample per arm at the registered MDE: {{ results.decision.additional_n_per_arm }}. This is a planning projection, not guaranteed future significance.
+{% endif %}
+
+## Limitations
+
+{% if experiment.source == 'public' %}
+The source has no exposure timestamps or pre-period covariates. Allocation is observed at installation; actual gate exposure is unavailable. All randomized players are retained, so this readout estimates assignment effects. No temporal sequential monitor or CUPED result can be recovered from this file. The reconstructed design and outlier policy were chosen with public data already available.
+{% else %}
+Simulations validate implementation under their stated data-generating assumptions. Exposure-conditioned comparisons require exposure independent of treatment and potential outcomes; conditioning on treatment-dependent exposure can bias causal effects. The platform does not identify interference or unmeasured post-randomization selection.
+{% endif %}
+{% for limitation in results.get('limitations', []) %}
+- {{ limitation }}
+{% endfor %}
+
+## Reproduce
+
+```sh
+uv run readout render {{ experiment.key }}
+```
+
+Restore the committed relational evidence first with `uv run python -m scripts.restore_evidence`, or regenerate every source scenario with `uv run python -m scripts.reset_and_rederive`.
