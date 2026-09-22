@@ -1,0 +1,77 @@
+key: cookie_cats
+name: 'Cookie Cats: moving the gate'
+status: running
+source: public
+unit_type: player
+salt: public-observed-assignment
+hypothesis: 'Retrospective reconstruction: moving the wait gate should improve seven-day
+  retention by at least five percent relative, roughly one percentage point at the
+  assumed planning baseline. This practical threshold and the rounds outlier policy
+  were chosen with the public dataset already available; they are not historical pre-registration.'
+source_detail:
+  source_url: https://www.kaggle.com/datasets/mursideyarkin/mobile-games-ab-testing-cookie-cats
+  download_url: https://www.kaggle.com/api/v1/datasets/download/mursideyarkin/mobile-games-ab-testing-cookie-cats
+  retrieved_at: '2026-09-22T15:14:28.059482+00:00'
+  source_version: 1
+  license_as_listed: Other (specified in description)
+  license_note: The description credits DataCamp and Tactile Entertainment but states
+    no additional license grant. The data is not covered by this repository's Apache
+    license.
+  sha256: 5ab54d761fbddcd50de7b88e4eaf7837cba4569474f50c043a4d17ee342c46bd
+  bytes: 2707297
+  description: Public randomized mobile-game assignment data, analyzed retrospectively.
+  rows: 90189
+  maximum_rounds: 49854
+  rounds_upper_quantile: 1073.6240000000107
+  exposure_note: Actual gate exposure is unavailable. All randomized installations
+    are retained; exposed=True is a computational inclusion flag, not an observed
+    gate exposure.
+  timestamps_available: false
+  pre_period_available: false
+design:
+  primary_metric_key: retention_7
+  metrics:
+  - key: retention_7
+    name: Seven-day retention
+    kind: proportion
+    direction: higher_is_better
+    guardrail_margin_relative: null
+    winsor_upper_percentile: null
+  - key: retention_1
+    name: One-day retention
+    kind: proportion
+    direction: higher_is_better
+    guardrail_margin_relative: 0.03
+    winsor_upper_percentile: null
+  - key: rounds
+    name: Rounds played
+    kind: mean
+    direction: higher_is_better
+    guardrail_margin_relative: 0.05
+    winsor_upper_percentile: 0.999
+  guardrail_metric_keys:
+  - retention_1
+  - rounds
+  secondary_metric_keys: []
+  variants:
+  - name: control
+    allocation: 0.5
+  - name: treatment
+    allocation: 0.5
+  mde_relative: 0.05
+  baseline: 0.19
+  standard_deviation: 1.0
+  alpha: 0.05
+  power: 0.8
+  planned_n_per_arm: 27276
+  planned_days: 14
+  mixing_variance: 0.0001
+  has_timestamps: false
+  bootstrap_seed: 20260922
+  bootstrap_resamples: 400
+  decision_rule:
+    text: 'ship: health passes, the primary interval excludes zero in the good direction,
+      and every guardrail passes its margin; no_ship: any guardrail fails or the primary
+      interval excludes the MDE in the good direction; extend: unresolved with additional
+      sample from the power calculator; blocked: health fails.'
+  fdr_q: 0.05
