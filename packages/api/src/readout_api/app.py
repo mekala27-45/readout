@@ -84,10 +84,18 @@ def parse_csv(contents: bytes) -> tuple[list[dict[str, Any]], list[str]]:
                 pre[key] = float(row[pre_field])
             if row.get(denominator_field, "").strip():
                 denominators[key] = float(row[denominator_field])
-        rows.append(UnitRow(unit_id=row["unit_id"], variant=cast(Literal["control", "treatment"], variant),
-            exposed=exposure in {"1", "true", "yes"}, day=int(row.get("day", "1")),
-            segment=row.get("segment", "all"), metrics=metrics, pre=pre,
-            denominators=denominators).model_dump())
+        rows.append(
+            UnitRow(
+                unit_id=row["unit_id"],
+                variant=cast(Literal["control", "treatment"], variant),
+                exposed=exposure in {"1", "true", "yes"},
+                day=int(row.get("day", "1")),
+                segment=row.get("segment", "all"),
+                metrics=metrics,
+                pre=pre,
+                denominators=denominators,
+            ).model_dump()
+        )
     if not rows:
         raise ValueError("CSV contains a header but no observations")
     return rows, [field.removeprefix("metric_") for field in metric_fields]
@@ -96,10 +104,16 @@ def parse_csv(contents: bytes) -> tuple[list[dict[str, Any]], list[str]]:
 def retrospective_planning(rows: list[dict[str, Any]], primary: dict[str, Any]) -> dict[str, Any]:
     """Derive explicitly retrospective planning assumptions from control units."""
     from readout_stats.power import required_sample_size
+
     key, kind = primary["key"], primary["kind"]
-    values = [float(row["metrics"][key]) / (float(row["denominators"][key]) if kind == "ratio" else 1)
-              for row in rows if row["variant"] == "control" and row["exposed"]
-              and row["metrics"].get(key) is not None]
+    values = [
+        float(row["metrics"][key]) / (float(row["denominators"][key]) if kind == "ratio" else 1)
+        for row in rows
+        if row["variant"] == "control"
+        and row["exposed"]
+        and row["metrics"].get(key) is not None
+        and (kind != "ratio" or row["denominators"].get(key) is not None)
+    ]
     baseline = abs(statistics.fmean(values)) if values else 0.0
     fallback = baseline == 0 or (kind == "proportion" and baseline == 1)
     if fallback:
@@ -107,11 +121,17 @@ def retrospective_planning(rows: list[dict[str, Any]], primary: dict[str, Any]) 
     deviation = statistics.stdev(values) if len(values) >= 2 else 1.0
     deviation = deviation or 1.0
     mde = min(0.1, (1 - baseline) / (2 * baseline)) if kind == "proportion" else 0.1
-    planned = required_sample_size(baseline, mde, standard_deviation=deviation,
-                                   kind="mean" if kind == "ratio" else kind)
-    return {"baseline": baseline, "standard_deviation": deviation, "mde_relative": mde,
-            "planned_n_per_arm": planned["n_per_arm"], "fallback_baseline": fallback,
-            "planning_method": "Retrospective control sample; ratio planning uses unit ratios and a mean approximation"}
+    planned = required_sample_size(
+        baseline, mde, standard_deviation=deviation, kind="mean" if kind == "ratio" else kind
+    )
+    return {
+        "baseline": baseline,
+        "standard_deviation": deviation,
+        "mde_relative": mde,
+        "planned_n_per_arm": planned["n_per_arm"],
+        "fallback_baseline": fallback,
+        "planning_method": "Retrospective control sample; ratio planning uses unit ratios and a mean approximation",
+    }
 
 
 def create_app(database_url: str | None = None, write_token: str | None = None) -> FastAPI:
@@ -138,14 +158,21 @@ def create_app(database_url: str | None = None, write_token: str | None = None) 
             repository.close()
 
     application = FastAPI(title="readout", version="0.1.0", lifespan=lifespan)
-    origins = os.getenv("READOUT_CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",")
-    application.add_middleware(CORSMiddleware, allow_origins=origins,
-                               allow_methods=["GET", "POST", "PATCH"],
-                               allow_headers=["Authorization", "Content-Type"])
+    origins = os.getenv(
+        "READOUT_CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
+    ).split(",")
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_methods=["GET", "POST", "PATCH"],
+        allow_headers=["Authorization", "Content-Type"],
+    )
 
     async def require_write(authorization: Annotated[str | None, Header()] = None) -> None:
         expected = f"Bearer {token}"
-        if authorization is None or not secrets.compare_digest(authorization.encode(), expected.encode()):
+        if authorization is None or not secrets.compare_digest(
+            authorization.encode(), expected.encode()
+        ):
             raise HTTPException(status_code=401, detail="A write bearer token is required")
 
     @application.exception_handler(NotFoundError)
@@ -172,6 +199,7 @@ def create_app(database_url: str | None = None, write_token: str | None = None) 
     @application.get("/api/bundle")
     async def bundle() -> dict[str, Any]:
         from readout_render.renderer import build_bundle
+
         return await run_in_threadpool(build_bundle, repo())
 
     @application.get("/api/experiments")
@@ -197,8 +225,12 @@ def create_app(database_url: str | None = None, write_token: str | None = None) 
     @application.post("/api/assign")
     async def assignment(payload: AssignmentRequest) -> dict[str, Any]:
         result = await run_in_threadpool(repo().assignment, payload.experiment_key, payload.unit_id)
-        structlog.get_logger().info("assignment_preview", unit_id=payload.unit_id,
-                                   experiment_key=payload.experiment_key, bucket=result["bucket"])
+        structlog.get_logger().info(
+            "assignment_preview",
+            unit_id=payload.unit_id,
+            experiment_key=payload.experiment_key,
+            bucket=result["bucket"],
+        )
         return result
 
     @application.get("/api/assign")
@@ -210,12 +242,16 @@ def create_app(database_url: str | None = None, write_token: str | None = None) 
         return await run_in_threadpool(repo().assign_units, key, payload.unit_ids)
 
     @application.get("/api/experiments/{key}/assignments")
-    async def assignments(key: str, limit: int = Query(default=1000, ge=1, le=10000)) -> list[dict[str, Any]]:
+    async def assignments(
+        key: str, limit: int = Query(default=1000, ge=1, le=10000)
+    ) -> list[dict[str, Any]]:
         return await run_in_threadpool(repo().get_assignments, key, limit=limit)
 
     @application.post("/api/experiments/{key}/observations", dependencies=[Depends(require_write)])
     async def observations(key: str, payload: ObservationBatch) -> dict[str, Any]:
-        return await run_in_threadpool(repo().import_rows, key, [r.model_dump() for r in payload.rows])
+        return await run_in_threadpool(
+            repo().import_rows, key, [r.model_dump() for r in payload.rows]
+        )
 
     async def uploaded_rows(file: UploadFile) -> tuple[list[dict[str, Any]], list[str]]:
         contents = await file.read(20_000_001)
@@ -230,31 +266,64 @@ def create_app(database_url: str | None = None, write_token: str | None = None) 
         return await run_in_threadpool(repo().import_rows, key, rows)
 
     @application.post("/api/upload", dependencies=[Depends(require_write)])
-    async def upload(file: Annotated[UploadFile, File()],
-                     name: Annotated[str, Form()] = "Uploaded experiment") -> dict[str, Any]:
+    async def upload(
+        file: Annotated[UploadFile, File()], name: Annotated[str, Form()] = "Uploaded experiment"
+    ) -> dict[str, Any]:
         from readout_render.renderer import render_manifest
+
         rows, keys = await uploaded_rows(file)
         key = f"upload-{secrets.token_hex(6)}"
-        metric_definitions = [{"key": key, "name": key.replace("_", " ").title(),
-            "kind": "ratio" if any(key in r["denominators"] for r in rows) else
-                    "proportion" if all(r["metrics"].get(key) in {None, 0.0, 1.0} for r in rows) else "mean"}
-            for key in keys]
+        metric_definitions = [
+            {
+                "key": key,
+                "name": key.replace("_", " ").title(),
+                "kind": "ratio"
+                if any(key in r["denominators"] for r in rows)
+                else "proportion"
+                if all(r["metrics"].get(key) in {None, 0.0, 1.0} for r in rows)
+                else "mean",
+            }
+            for key in keys
+        ]
         planning = await run_in_threadpool(retrospective_planning, rows, metric_definitions[0])
-        await run_in_threadpool(repo().create_experiment, {
-            "key": key, "name": name, "status": "running", "source": "uploaded",
-            "source_detail": {"filename": file.filename, "provenance": "User supplied unit-level CSV",
-                "protocol": "Retrospective design reconstructed at upload; not historical pre-registration",
-                "description": "Planning assumptions are reconstructed from uploaded controls. Degenerate controls use a disclosed baseline assumption.",
-                "planning": planning},
-            "design": {"primary_metric_key": keys[0], "metrics": metric_definitions,
-                       "secondary_metric_keys": keys[1:], "has_timestamps": any(r["day"] > 1 for r in rows),
-                       **{field: planning[field] for field in ("baseline", "standard_deviation", "mde_relative", "planned_n_per_arm")}},
-        })
+        await run_in_threadpool(
+            repo().create_experiment,
+            {
+                "key": key,
+                "name": name,
+                "status": "running",
+                "source": "uploaded",
+                "source_detail": {
+                    "filename": file.filename,
+                    "provenance": "User supplied unit-level CSV",
+                    "protocol": "Retrospective design reconstructed at upload; not historical pre-registration",
+                    "description": "Planning assumptions are reconstructed from uploaded controls. Degenerate controls use a disclosed baseline assumption.",
+                    "planning": planning,
+                },
+                "design": {
+                    "primary_metric_key": keys[0],
+                    "metrics": metric_definitions,
+                    "secondary_metric_keys": keys[1:],
+                    "has_timestamps": any(r["day"] > 1 for r in rows),
+                    **{
+                        field: planning[field]
+                        for field in (
+                            "baseline",
+                            "standard_deviation",
+                            "mde_relative",
+                            "planned_n_per_arm",
+                        )
+                    },
+                },
+            },
+        )
         await run_in_threadpool(repo().import_rows, key, rows)
         await run_in_threadpool(repo().analyze, key)
         manifest = await run_in_threadpool(repo().latest_manifest, key)
         rendered = await run_in_threadpool(render_manifest, manifest)
-        await run_in_threadpool(repo().record_readout, key, manifest["run"]["id"], rendered["markdown"])
+        await run_in_threadpool(
+            repo().record_readout, key, manifest["run"]["id"], rendered["markdown"]
+        )
         return {"manifest": manifest, **rendered}
 
     @application.post("/api/experiments/{key}/analyze", dependencies=[Depends(require_write)])
@@ -284,15 +353,21 @@ def create_app(database_url: str | None = None, write_token: str | None = None) 
     @application.get("/api/experiments/{key}/readout", response_model=None)
     async def readout(key: str, format: str = "markdown") -> HTMLResponse | PlainTextResponse:
         from readout_render.renderer import render_manifest
+
         if format not in {"html", "markdown"}:
             raise HTTPException(status_code=422, detail="format must be html or markdown")
         manifest = await run_in_threadpool(repo().latest_manifest, key)
         rendered = await run_in_threadpool(render_manifest, manifest)
-        await run_in_threadpool(repo().record_readout, key, manifest["run"]["id"], rendered["markdown"])
+        await run_in_threadpool(
+            repo().record_readout, key, manifest["run"]["id"], rendered["markdown"]
+        )
         if format == "html":
             return HTMLResponse(rendered["html"])
-        return PlainTextResponse(rendered["markdown"], media_type="text/markdown",
-                                 headers={"Content-Disposition": f'attachment; filename="{key}.md"'})
+        return PlainTextResponse(
+            rendered["markdown"],
+            media_type="text/markdown",
+            headers={"Content-Disposition": f'attachment; filename="{key}.md"'},
+        )
 
     @application.get("/api/calibration")
     async def calibration() -> dict[str, Any]:
@@ -301,6 +376,7 @@ def create_app(database_url: str | None = None, write_token: str | None = None) 
     @application.post("/api/design/power")
     async def power(payload: PowerRequest) -> dict[str, Any]:
         from readout_stats.power import design_power
+
         return await run_in_threadpool(design_power, payload.model_dump())
 
     return application

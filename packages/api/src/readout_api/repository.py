@@ -41,7 +41,9 @@ class ConflictError(ValueError):
 
 
 def database_url() -> str:
-    return os.getenv("READOUT_DATABASE_URL", os.getenv("DATABASE_URL", "sqlite:///artifacts/readout.db"))
+    return os.getenv(
+        "READOUT_DATABASE_URL", os.getenv("DATABASE_URL", "sqlite:///artifacts/readout.db")
+    )
 
 
 def make_engine(url: str) -> Engine:
@@ -58,9 +60,11 @@ def make_engine(url: str) -> Engine:
             Path(url.removeprefix("sqlite:///")).parent.mkdir(parents=True, exist_ok=True)
     engine = create_engine(url, **kwargs)
     if url.startswith("sqlite"):
+
         @event.listens_for(engine, "connect")
         def configure_sqlite(connection: Any, _: Any) -> None:
             connection.execute("PRAGMA foreign_keys=ON")
+
     return engine
 
 
@@ -148,16 +152,23 @@ class Repository:
         with Session(self.engine) as session:
             record = _experiment(session, key)
             previous = copy.deepcopy(record.design)
-            design_updates = {**payload.get("design", {}),
-                              **{k: v for k, v in payload.items() if k in Design.model_fields}}
+            design_updates = {
+                **payload.get("design", {}),
+                **{k: v for k, v in payload.items() if k in Design.model_fields},
+            }
             current = Design.model_validate({**record.design, **design_updates}).model_dump()
             if record.design_hash is not None and current != previous:
-                record.design_deviations = [*record.design_deviations, {
-                    "recorded_at": now(), "changed_fields": sorted(k for k in current if current[k] != previous[k]),
-                    "previous_hash": content_hash(previous), "new_hash": content_hash(current),
-                    "registered_hash": record.design_hash,
-                    "reason": payload.get("reason", "Design edited after registration"),
-                }]
+                record.design_deviations = [
+                    *record.design_deviations,
+                    {
+                        "recorded_at": now(),
+                        "changed_fields": sorted(k for k in current if current[k] != previous[k]),
+                        "previous_hash": content_hash(previous),
+                        "new_hash": content_hash(current),
+                        "registered_hash": record.design_hash,
+                        "reason": payload.get("reason", "Design edited after registration"),
+                    },
+                ]
             record.design = current
             for field in ("name", "hypothesis", "owner"):
                 if field in payload:
@@ -177,12 +188,20 @@ class Repository:
             results = []
             for unit_id in dict.fromkeys(unit_ids):
                 result = assign(experiment_dict(experiment), unit_id)
-                existing = session.exec(select(Assignment).where(
-                    Assignment.experiment_id == experiment.id, Assignment.unit_id == unit_id
-                )).first()
+                existing = session.exec(
+                    select(Assignment).where(
+                        Assignment.experiment_id == experiment.id, Assignment.unit_id == unit_id
+                    )
+                ).first()
                 if existing is None:
-                    session.add(Assignment(experiment_id=experiment.id, unit_id=unit_id,
-                                           variant=result["variant"], bucket=result["bucket"]))
+                    session.add(
+                        Assignment(
+                            experiment_id=experiment.id,
+                            unit_id=unit_id,
+                            variant=result["variant"],
+                            bucket=result["bucket"],
+                        )
+                    )
                 elif existing.variant != result["variant"]:
                     result["original_variant"] = existing.variant
                     result["ramp_changed"] = True
@@ -193,12 +212,22 @@ class Repository:
     def get_assignments(self, key: str, *, limit: int = 1000) -> list[dict[str, Any]]:
         with Session(self.engine) as session:
             experiment = _experiment(session, key)
-            records = session.exec(select(Assignment).where(
-                Assignment.experiment_id == experiment.id).limit(limit)).all()
+            records = session.exec(
+                select(Assignment).where(Assignment.experiment_id == experiment.id).limit(limit)
+            ).all()
             from readout_core.hashing import hash_unit_id
-            return [{"id": r.id, "experiment_id": r.experiment_id,
-                     "unit_id_hash": hash_unit_id(r.unit_id), "variant": r.variant,
-                     "bucket": r.bucket, "assigned_at": r.assigned_at} for r in records]
+
+            return [
+                {
+                    "id": r.id,
+                    "experiment_id": r.experiment_id,
+                    "unit_id_hash": hash_unit_id(r.unit_id),
+                    "variant": r.variant,
+                    "bucket": r.bucket,
+                    "assigned_at": r.assigned_at,
+                }
+                for r in records
+            ]
 
     def import_rows(self, key: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
         normalized = [UnitRow.model_validate(row).model_dump() for row in rows]
@@ -212,12 +241,21 @@ class Repository:
             known_metrics = {m["key"] for m in experiment.registered_design["metrics"]}  # type: ignore[index]
             for row in normalized:
                 if set(row["metrics"]) - known_metrics:
-                    raise ValueError("observation contains a metric absent from the registered design")
-            if session.exec(select(UnitObservation).where(
-                UnitObservation.experiment_id == experiment.id)).first():
-                raise ConflictError("observations already imported; create a new experiment for a new dataset")
-            existing = {r.unit_id: r for r in session.exec(select(Assignment).where(
-                Assignment.experiment_id == experiment.id)).all()}
+                    raise ValueError(
+                        "observation contains a metric absent from the registered design"
+                    )
+            if session.exec(
+                select(UnitObservation).where(UnitObservation.experiment_id == experiment.id)
+            ).first():
+                raise ConflictError(
+                    "observations already imported; create a new experiment for a new dataset"
+                )
+            existing = {
+                r.unit_id: r
+                for r in session.exec(
+                    select(Assignment).where(Assignment.experiment_id == experiment.id)
+                ).all()
+            }
             assignment_rows, exposure_rows, observation_rows, metric_rows = [], [], [], []
             timestamp = now()
             assignment_design = experiment_dict(experiment)
@@ -226,39 +264,91 @@ class Repository:
                 if unit_id in existing and existing[unit_id].variant != row["variant"]:
                     raise ValueError("imported variant conflicts with audited assignment")
                 if unit_id not in existing:
-                    assignment_rows.append({"id": identifier(), "experiment_id": experiment.id,
-                        "unit_id": unit_id, "variant": row["variant"],
-                        "bucket": assign(assignment_design, unit_id)["bucket"],
-                        "assigned_at": timestamp})
+                    assignment_rows.append(
+                        {
+                            "id": identifier(),
+                            "experiment_id": experiment.id,
+                            "unit_id": unit_id,
+                            "variant": row["variant"],
+                            "bucket": assign(assignment_design, unit_id)["bucket"],
+                            "assigned_at": timestamp,
+                        }
+                    )
                 if row["exposed"]:
-                    exposure_rows.append({"id": identifier(), "experiment_id": experiment.id,
-                        "unit_id": unit_id, "day": row["day"], "first_exposed_at": timestamp})
-                observation_rows.append({"id": identifier(), "experiment_id": experiment.id,
-                                        "unit_id": unit_id, "row": row})
+                    exposure_rows.append(
+                        {
+                            "id": identifier(),
+                            "experiment_id": experiment.id,
+                            "unit_id": unit_id,
+                            "day": row["day"],
+                            "first_exposed_at": timestamp,
+                        }
+                    )
+                observation_rows.append(
+                    {
+                        "id": identifier(),
+                        "experiment_id": experiment.id,
+                        "unit_id": unit_id,
+                        "row": row,
+                    }
+                )
                 for metric_key, value in row["metrics"].items():
-                    metric_rows.append({"id": identifier(), "experiment_id": experiment.id,
-                        "unit_id": unit_id, "metric_key": metric_key, "value": value,
-                        "pre_value": row["pre"].get(metric_key),
-                        "sessions": row["denominators"].get(metric_key)})
-            for model, batch in ((Assignment, assignment_rows), (Exposure, exposure_rows),
-                                 (UnitObservation, observation_rows), (UnitMetric, metric_rows)):
+                    metric_rows.append(
+                        {
+                            "id": identifier(),
+                            "experiment_id": experiment.id,
+                            "unit_id": unit_id,
+                            "metric_key": metric_key,
+                            "value": value,
+                            "pre_value": row["pre"].get(metric_key),
+                            "sessions": row["denominators"].get(metric_key),
+                        }
+                    )
+            for model, batch in (
+                (Assignment, assignment_rows),
+                (Exposure, exposure_rows),
+                (UnitObservation, observation_rows),
+                (UnitMetric, metric_rows),
+            ):
                 if batch:
                     session.execute(insert(model), batch)
             session.commit()
-        return {"experiment_key": key, "rows": len(normalized), "inputs_hash": content_hash(normalized)}
+        return {
+            "experiment_key": key,
+            "rows": len(normalized),
+            "inputs_hash": content_hash(normalized),
+        }
 
     def get_rows(self, key: str) -> list[dict[str, Any]]:
         with Session(self.engine) as session:
             experiment = _experiment(session, key)
-            observations = {r.unit_id: r.row for r in session.exec(select(UnitObservation).where(
-                UnitObservation.experiment_id == experiment.id)).all()}
-            assignments = session.exec(select(Assignment).where(
-                Assignment.experiment_id == experiment.id).order_by(Assignment.unit_id)).all()
-            return [observations.get(assignment.unit_id, {
-                "unit_id": assignment.unit_id, "variant": assignment.variant,
-                "exposed": False, "day": 1, "segment": "unobserved",
-                "metrics": {}, "pre": {}, "denominators": {},
-            }) for assignment in assignments]
+            observations = {
+                r.unit_id: r.row
+                for r in session.exec(
+                    select(UnitObservation).where(UnitObservation.experiment_id == experiment.id)
+                ).all()
+            }
+            assignments = session.exec(
+                select(Assignment)
+                .where(Assignment.experiment_id == experiment.id)
+                .order_by(Assignment.unit_id)
+            ).all()
+            return [
+                observations.get(
+                    assignment.unit_id,
+                    {
+                        "unit_id": assignment.unit_id,
+                        "variant": assignment.variant,
+                        "exposed": False,
+                        "day": 1,
+                        "segment": "unobserved",
+                        "metrics": {},
+                        "pre": {},
+                        "denominators": {},
+                    },
+                )
+                for assignment in assignments
+            ]
 
     def analyze(self, key: str) -> dict[str, Any]:
         experiment = self.get_experiment(key)
@@ -266,6 +356,7 @@ class Repository:
             raise ConflictError("register the design before analysis")
         from readout_stats.engine import analyze
         from readout_stats.health import check_health
+
         design = experiment["registered_design"]
         if content_hash(design) != experiment["design_hash"]:
             raise ConflictError("registered design hash mismatch")
@@ -273,32 +364,49 @@ class Repository:
         health = serializable(check_health(design, rows))
         if not health:
             raise ValueError("health checker must produce a record")
-        run = AnalysisRun(experiment_id=experiment["id"], inputs_hash=content_hash(rows),
-                          design_hash=experiment["design_hash"],
-                          n_per_arm=dict(Counter(row["variant"] for row in rows if row["exposed"])))
+        run = AnalysisRun(
+            experiment_id=experiment["id"],
+            inputs_hash=content_hash(rows),
+            design_hash=experiment["design_hash"],
+            n_per_arm=dict(Counter(row["variant"] for row in rows if row["exposed"])),
+        )
         run_id = run.id
         with Session(self.engine) as session:
             session.add(run)
             session.flush()
             for item in health:
-                session.add(HealthCheck(analysis_run_id=run_id,
-                    kind=item.get("kind", item.get("check", "unknown")),
-                    statistic=item.get("statistic"), p_value=item.get("p_value"),
-                    status=item["status"], detail={"health_record": item}))
+                session.add(
+                    HealthCheck(
+                        analysis_run_id=run_id,
+                        kind=item.get("kind", item.get("check", "unknown")),
+                        statistic=item.get("statistic"),
+                        p_value=item.get("p_value"),
+                        status=item["status"],
+                        detail={"health_record": item},
+                    )
+                )
             session.commit()
         persisted_health = self.get_health(key, run_id)
         results = serializable(analyze(design, rows, persisted_health))
         if any(h["status"] == "block" for h in persisted_health) and results.get("metrics"):
             raise ValueError("engine violated the health gate")
-        decision_data = results.get("decision", {"decision": "blocked", "reason": "No decision produced"})
+        decision_data = results.get(
+            "decision", {"decision": "blocked", "reason": "No decision produced"}
+        )
         with Session(self.engine) as session:
             stored = session.get(AnalysisRun, run_id)
             assert stored is not None
             stored.results = results
             stored.status = "complete"
             session.add(stored)
-            session.add(Decision(experiment_id=experiment["id"], analysis_run_id=run_id,
-                decision=decision_data["decision"], rule_applied=decision_data))
+            session.add(
+                Decision(
+                    experiment_id=experiment["id"],
+                    analysis_run_id=run_id,
+                    decision=decision_data["decision"],
+                    rule_applied=decision_data,
+                )
+            )
             record = _experiment(session, key)
             record.status = "readout"
             record.decision = decision_data["decision"]
@@ -317,8 +425,12 @@ class Repository:
     def get_health(self, key: str, run_id: str) -> list[dict[str, Any]]:
         self.get_run(key, run_id)
         with Session(self.engine) as session:
-            return [health_dict(row) for row in session.exec(select(HealthCheck).where(
-                HealthCheck.analysis_run_id == run_id)).all()]
+            return [
+                health_dict(row)
+                for row in session.exec(
+                    select(HealthCheck).where(HealthCheck.analysis_run_id == run_id)
+                ).all()
+            ]
 
     def get_decision(self, key: str, decision_id: str) -> dict[str, Any]:
         with Session(self.engine) as session:
@@ -331,17 +443,31 @@ class Repository:
     def latest_manifest(self, key: str) -> dict[str, Any]:
         with Session(self.engine) as session:
             experiment = _experiment(session, key)
-            run = session.exec(select(AnalysisRun).where(AnalysisRun.experiment_id == experiment.id)
-                               .order_by(col(AnalysisRun.ran_at).desc())).first()
+            run = session.exec(
+                select(AnalysisRun)
+                .where(AnalysisRun.experiment_id == experiment.id)
+                .order_by(col(AnalysisRun.ran_at).desc())
+            ).first()
             if run is None:
                 raise NotFoundError("experiment has no analysis run")
-            decision = session.exec(select(Decision).where(Decision.experiment_id == experiment.id,
-                                      Decision.analysis_run_id == run.id)).first()
-            health = [health_dict(r) for r in session.exec(select(HealthCheck).where(
-                HealthCheck.analysis_run_id == run.id)).all()]
-            return {"experiment": experiment_dict(experiment), "run": run.model_dump(),
-                    "health": health, "results": run.results,
-                    "decision": decision.model_dump() if decision else None}
+            decision = session.exec(
+                select(Decision).where(
+                    Decision.experiment_id == experiment.id, Decision.analysis_run_id == run.id
+                )
+            ).first()
+            health = [
+                health_dict(r)
+                for r in session.exec(
+                    select(HealthCheck).where(HealthCheck.analysis_run_id == run.id)
+                ).all()
+            ]
+            return {
+                "experiment": experiment_dict(experiment),
+                "run": run.model_dump(),
+                "health": health,
+                "results": run.results,
+                "decision": decision.model_dump() if decision else None,
+            }
 
     def decide(self, key: str, run_id: str) -> dict[str, Any]:
         run = self.get_run(key, run_id)
@@ -349,11 +475,16 @@ class Repository:
             raise ConflictError("only a completed analysis can be decided")
         recommendation = run["results"].get("decision", {})
         if recommendation.get("decision") == "ship" and recommendation.get("provisional"):
-            raise ConflictError("Cannot finalize a provisional ship recommendation: both arms must reach the registered sample horizon")
+            raise ConflictError(
+                "Cannot finalize a provisional ship recommendation: both arms must reach the registered sample horizon"
+            )
         with Session(self.engine) as session:
             experiment = _experiment(session, key)
-            record = session.exec(select(Decision).where(Decision.experiment_id == experiment.id,
-                                  Decision.analysis_run_id == run_id)).first()
+            record = session.exec(
+                select(Decision).where(
+                    Decision.experiment_id == experiment.id, Decision.analysis_run_id == run_id
+                )
+            ).first()
             if record is None:
                 raise ConflictError("analysis has no recorded decision")
             experiment.status = "decided"
@@ -376,12 +507,16 @@ class Repository:
     def record_readout(self, key: str, run_id: str, markdown: str) -> str:
         """Bind the decision audit to the bytes actually rendered for download."""
         import hashlib
+
         self.get_run(key, run_id)
         digest = hashlib.sha256(markdown.encode("utf-8")).hexdigest()
         with Session(self.engine) as session:
             experiment = _experiment(session, key)
-            decision = session.exec(select(Decision).where(Decision.experiment_id == experiment.id,
-                                    Decision.analysis_run_id == run_id)).first()
+            decision = session.exec(
+                select(Decision).where(
+                    Decision.experiment_id == experiment.id, Decision.analysis_run_id == run_id
+                )
+            ).first()
             if decision is None:
                 raise NotFoundError("decision not found in this experiment")
             decision.rendered_readout_sha256 = digest
@@ -404,6 +539,16 @@ class Repository:
 
     def reset(self) -> None:
         with Session(self.engine) as session:
-            for model in (Decision, HealthCheck, AnalysisRun, UnitMetric, UnitObservation, Exposure, Assignment, Experiment, Evidence):
+            for model in (
+                Decision,
+                HealthCheck,
+                AnalysisRun,
+                UnitMetric,
+                UnitObservation,
+                Exposure,
+                Assignment,
+                Experiment,
+                Evidence,
+            ):
                 session.execute(delete(model))
             session.commit()

@@ -1,4 +1,4 @@
-"""StrictModel ported from pricepoint, with experiment-specific invariants."""
+"""StrictModel ported from trajectory, strengthened for experiment contracts."""
 
 from __future__ import annotations
 
@@ -9,7 +9,25 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class StrictModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, allow_inf_nan=False)
+    model_config = ConfigDict(
+        extra="forbid",
+        strict=True,
+        allow_inf_nan=False,
+        validate_assignment=True,
+        use_enum_values=False,
+        frozen=False,
+    )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _ignore_computed_fields(cls, data: Any) -> Any:
+        """Preserve trajectory's serialized computed-field round trip."""
+        computed = cls.model_computed_fields
+        if computed and isinstance(data, dict):
+            overlap = computed.keys() & data.keys()
+            if overlap:
+                return {k: v for k, v in data.items() if k not in overlap}
+        return data
 
 
 class Variant(StrictModel):
@@ -45,9 +63,12 @@ class Design(StrictModel):
     metrics: list[Metric] = Field(default_factory=lambda: [Metric(key="value", name="Outcome")])
     guardrail_metric_keys: list[str] = Field(default_factory=list)
     secondary_metric_keys: list[str] = Field(default_factory=list)
-    variants: list[Variant] = Field(default_factory=lambda: [
-        Variant(name="control", allocation=0.5), Variant(name="treatment", allocation=0.5)
-    ])
+    variants: list[Variant] = Field(
+        default_factory=lambda: [
+            Variant(name="control", allocation=0.5),
+            Variant(name="treatment", allocation=0.5),
+        ]
+    )
     alpha: float = Field(default=0.05, gt=0, lt=0.5)
     power: float = Field(default=0.8, gt=0.5, lt=1)
     mde_relative: float = Field(default=0.1, gt=0)
@@ -67,15 +88,21 @@ class Design(StrictModel):
         keys = [metric.key for metric in self.metrics]
         if len(keys) != len(set(keys)):
             raise ValueError("metric keys must be unique")
-        selected = [self.primary_metric_key, *self.guardrail_metric_keys, *self.secondary_metric_keys]
+        selected = [
+            self.primary_metric_key,
+            *self.guardrail_metric_keys,
+            *self.secondary_metric_keys,
+        ]
         if any(key not in keys for key in selected):
             raise ValueError("every selected metric must have a definition")
         if set(self.guardrail_metric_keys) & set(self.secondary_metric_keys):
             raise ValueError("guardrail and secondary metric roles must be disjoint")
         if self.primary_metric_key in self.guardrail_metric_keys + self.secondary_metric_keys:
             raise ValueError("the primary metric cannot have another role")
-        if any(metric.key in self.guardrail_metric_keys and metric.guardrail_margin_relative is None
-               for metric in self.metrics):
+        if any(
+            metric.key in self.guardrail_metric_keys and metric.guardrail_margin_relative is None
+            for metric in self.metrics
+        ):
             raise ValueError("every guardrail must declare its non-inferiority margin")
         if sorted(v.name for v in self.variants) != ["control", "treatment"]:
             raise ValueError("exactly one control and one treatment variant are required")
