@@ -17,5 +17,11 @@
   "frontend_golden_tests": 3,
   "independent_process_persistence": "pass",
   "runtime": "Linux Docker Python 3.12",
-  "public_api_deployed": false
+  "public_api_deployed": false,
+  "frontend_static_routes": 18,
+  "frontend_production_build": "pass",
+  "real_browser_upload_download": "pass",
+  "real_browser_offline_fallback": "pass",
+  "fresh_docker_evidence_restore": "pass",
+  "fresh_docker_canonical_experiments": 8
 }

@@ -39,6 +39,10 @@ Public API deployment is not claimed by this build unless separately verified. N
 
 ## Failure handling
 
+If a published route fails to load, the canonical bundle cannot be fetched, the claim gate detects altered evidence, or the browser shows an application error, stop promoting that revision. Redeploy the previous successful Pages workflow run, or revert the faulty source commit and let validation publish the correction. Keep the last successful evidence snapshot available. Never use canonical reset against a live external database as a rollback method.
+
+For this initial release, the public frontend is read-only and no public API or cloud database was provisioned. Release verification covers HTTP responses, the registry, an experiment readout, calibration, and static assets. There is no production on-call group, feature-flag service, or production latency baseline to certify.
+
 An SRM block is an analytical stop, not an infrastructure error. Its readout should contain health and a blocked decision with no metrics. Missing evidence makes the claim gate fail. A pending analysis after an exception retains its independently committed health rows; investigate the inputs and rerun only after resolving the cause. Never patch generated figures by hand.
 
 Postgres tests use an availability probe. Local environments without Docker show a named skip; CI sets `READOUT_REQUIRE_POSTGRES` so an unavailable dependency fails the job. The out-of-process persistence script starts its own API and launches another database observer, so it can detect a request that flushed but never committed.

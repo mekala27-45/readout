@@ -30,7 +30,7 @@ def main() -> None:
         capture_output=True,
         check=True,
     ).stdout.splitlines()
-    paths = sorted(set(p for p in paths if not p.startswith("docs/demo-frames/")))
+    paths = sorted(set(paths))
     tree = "\n".join(paths)
     lines = [
         "# Delivery record",
