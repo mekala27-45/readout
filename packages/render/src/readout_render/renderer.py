@@ -62,7 +62,7 @@ def validate_manifest(manifest: dict[str, Any]) -> None:
     if not manifest or not manifest.get("experiment") or not manifest.get("run"):
         raise ValueError("Cannot render without a stored experiment and analysis run")
     health = manifest.get("health")
-    if not health or not any(row.get("kind") == "srm" for row in health):
+    if not health or not any(str(row.get("kind", row.get("check", ""))).startswith("srm") for row in health):
         raise ValueError("Cannot render metrics without a health check row")
     run = manifest["run"]
     for row in health:

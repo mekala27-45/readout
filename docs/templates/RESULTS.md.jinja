@@ -1,0 +1,115 @@
+# Measured results
+
+Computed at {{ generated_at }} from stored relational records. Every simulation is labeled by scenario and seed in its manifest. Public Cookie Cats observations are analyzed separately.
+
+## Peeking calibration
+
+Source: simulated true null. Seed and configuration: {{ calibration.get('config', calibration.get('metadata', {}))|tojson }}.
+
+| Daily checks | Naive false positive rate and interval | Sequential false positive rate and interval |
+| ---: | --- | --- |
+{% for row in calibration.peeking %}
+| {{ row.day }} | {{ row.naive|band }} | {{ row.sequential|band }} |
+{% endfor %}
+
+## Empirical power
+
+Source: simulated effect exactly at the registered MDE. Counts come from engine rejections, not from the calculator's own formula.
+
+| Design multiple | Sample per arm | Empirical power and interval | Theoretical power |
+| ---: | ---: | --- | ---: |
+{% for row in calibration.power %}
+| {{ row.get('multiple', row.get('multiplier')) }} | {{ row.get('n_per_arm') }} | {{ row.get('empirical', row)|band }} | {{ row.get('theoretical', row.get('theoretical_power'))|percent }} |
+{% endfor %}
+
+## SRM sensitivity
+
+Source: simulated assignment dropout. Detection means crossing the platform blocking threshold, not the warning threshold.
+
+| Initial sample per arm | Treatment dropout | Blocking probability and interval |
+| ---: | ---: | --- |
+{% for row in calibration.srm %}
+| {{ row.get('n_per_arm') }} | {{ row.get('dropout')|percent }} | {{ row.get('detection', row)|band }} |
+{% endfor %}
+
+## Pricepoint reproduction
+
+```json
+{{ pricepoint|json }}
+```
+
+The source assumes independent product-week observations on a transformed demand scale. Serial dependence, substitution and interference can raise the actual sample requirement. This reproduction checks arithmetic, not identification or independence.
+
+## CUPED recovery
+
+Source: simulated correlated pre-period values. Empirical effect sampling distributions and variance reduction:
+
+```json
+{{ calibration.get('cuped', {})|json }}
+```
+
+## Ratio interval coverage
+
+Source: simulated sessions correlated within randomized users. Delta intervals preserve the user as the sampling unit; the naive comparison treats sessions as independent.
+
+```json
+{{ calibration.get('delta', {})|json }}
+```
+
+## Exposure dilution
+
+Source: simulated exposure independent of assignment and potential outcomes. This specific generator supports the exposure-conditioned comparison; arbitrary real exposure does not.
+
+```json
+{{ calibration.get('exposure', {})|json }}
+```
+
+## Mixing-variance sensitivity
+
+```json
+{{ calibration.get('mixing_sensitivity', calibration.get('sensitivity', {}))|json }}
+```
+
+## Decisions across sources
+
+| Experiment | Source | Health | Decision | Primary effect and interval |
+| --- | --- | --- | --- | --- |
+{% for manifest in experiments %}
+{% set r = manifest.run.results %}
+| {{ manifest.experiment.key }} | {{ manifest.experiment.source }} | {{ manifest.health|map(attribute='status')|join(', ') }} | {{ r.decision.decision }} | {{ r.primary|interval if r.get('primary') else 'blocked; no metrics' }} |
+{% endfor %}
+
+## Cookie Cats
+
+{% for manifest in experiments if manifest.experiment.key == 'cookie_cats' %}
+{% set r = manifest.run.results %}
+{% for check in manifest.health if check.get('check', check.kind) in ['srm_assigned','srm_exposed'] %}
+{{ check.get('check', check.kind) }}: conventional **{{ check.get('conventional_verdict') }}**, platform **{{ check.get('blocking_verdict') }}**, p = {{ check.get('p_value')|number(6) }}. Observed {{ check.get('observed')|tojson }}, expected {{ check.get('expected')|tojson }}. The platform records the conventional warning while reserving blocking for stronger mismatch evidence.
+{% endfor %}
+
+{% if r.get('primary') %}
+Primary retention effect: **{{ r.primary|interval }}**, relative **{{ r.primary|interval(true) }}**. Decision: **{{ r.decision.decision }}**.
+
+| Metric | Declared policy effect and interval | Without policy effect and interval |
+| --- | --- | --- |
+{% for raw in r.get('raw_metrics', []) %}
+{% for metric in r.metrics if metric.key == raw.key %}
+| {{ metric.name }} | {{ metric|interval }} | {{ raw|interval }} |
+{% endfor %}
+{% endfor %}
+
+Data diagnostics: {{ manifest.experiment.source_detail|tojson }}.
+{% endif %}
+{% endfor %}
+
+## Assignment evidence
+
+```json
+{{ assignment|json }}
+```
+
+## Limitations
+
+Monte Carlo confidence bands measure sampling uncertainty in the measured scenarios. They do not prove validity on all outcome distributions. Estimated-variance mSPRT is approximate. The normal power approximation can differ from finite-sample Welch inference. The public experiment was not prospectively pre-registered here, has no pre-period or temporal data, and lacks observed gate exposure. Its winsorization policy is a retrospective sensitivity analysis. The listed Kaggle license does not specify a general redistribution grant. The software's Apache license does not apply to that dataset.
+
+The exposed-unit estimand needs treatment-independent exposure and ignorable missingness. Fixed-horizon decisions must respect the registered horizon. Exploratory secondary metrics and segments are separate correction families; their pointwise intervals are not adjusted confidence intervals. Production authentication, upload isolation between users, workload limits beyond the demo cap, interference detection and non-randomized causal identification are outside this build. Optional stretch modules were deferred.
