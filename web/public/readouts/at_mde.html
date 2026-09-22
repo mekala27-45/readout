@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Effect at the MDE</title>
+<style>
+:root{color-scheme:light dark}body{max-width:1100px;margin:48px auto;padding:0 28px;font:16px/1.6 system-ui;background:#0b0f14;color:#fafafa}h1{font-size:42px;letter-spacing:-.04em}h2{padding-top:24px;border-top:1px solid #475569;color:#67e8f9}table{border-collapse:collapse;width:100%;font-size:13px;display:block;overflow:auto}td,th{border-bottom:1px solid #475569;padding:12px;text-align:left;font-variant-numeric:tabular-nums}code,pre{font-family:ui-monospace,monospace}pre{padding:20px;background:#17212d;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}a{color:#67e8f9}blockquote{border-left:3px solid #0891b2;margin-left:0;padding:12px 20px;background:#17212d}p,td{overflow-wrap:anywhere}@media print{body{background:white;color:#111;margin:0;max-width:none;font-size:11pt}h2{color:#111;break-after:avoid}pre,blockquote{background:#eee}table{display:table}tr{break-inside:avoid}a{color:#111}h1{font-size:26pt}}
+</style></head><body><main><h1>Effect at the MDE</h1>
+<p>Source: <strong>simulated</strong>. Effect equals the design threshold exactly.
+Scenario: <code>at_mde</code>. Seed: 20260922.</p>
+<p>Analysis recorded: 2026-09-22T15:57:10.418025+00:00. Input fingerprint: <code>b0a5b3d55fadd5a0c2ba82315299f28c7bf347a97d18b25bdbb3a5e520a32b33</code>.</p>
+<h2>Health</h2>
+<p>A p-value below the conventional SRM threshold triggers a warning; a p-value below the stricter platform threshold blocks analysis. Both outcomes remain visible. A warning permits analysis with a qualification.</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Status</th>
+<th style="text-align: right;">Statistic</th>
+<th style="text-align: right;">p-value</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>srm_assigned</td>
+<td>warn</td>
+<td style="text-align: right;">5.4383</td>
+<td style="text-align: right;">0.019700</td>
+<td>treatment is short by 49.0 units versus configured allocation; block below 0.001, warn below 0.05.</td>
+</tr>
+<tr>
+<td>srm_exposed</td>
+<td>warn</td>
+<td style="text-align: right;">5.4383</td>
+<td style="text-align: right;">0.019700</td>
+<td>treatment is short by 49.0 units versus configured allocation; block below 0.001, warn below 0.05.</td>
+</tr>
+<tr>
+<td>exposure</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Analysis conditions on exposure. Random assignment alone does not identify this effect if treatment changes exposure.</td>
+</tr>
+<tr>
+<td>missingness: value</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Missing metric values or ratio denominators by exposed arm; primary and guardrail metrics require two valid units per arm. Complete-case analysis assumes ignorable missingness.</td>
+</tr>
+<tr>
+<td>missingness: quality</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Missing metric values or ratio denominators by exposed arm; primary and guardrail metrics require two valid units per arm. Complete-case analysis assumes ignorable missingness.</td>
+</tr>
+<tr>
+<td>missingness: retained</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Missing metric values or ratio denominators by exposed arm; primary and guardrail metrics require two valid units per arm. Complete-case analysis assumes ignorable missingness.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>assigned allocation:</strong> conventional verdict <strong>warn</strong> at 0.050000; platform verdict <strong>pass</strong> at 0.001000.</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th style="text-align: right;">Observed units</th>
+<th style="text-align: right;">Expected units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>control</td>
+<td style="text-align: right;">932</td>
+<td style="text-align: right;">883.0</td>
+</tr>
+<tr>
+<td>treatment</td>
+<td style="text-align: right;">834</td>
+<td style="text-align: right;">883.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>exposed allocation:</strong> conventional verdict <strong>warn</strong> at 0.050000; platform verdict <strong>pass</strong> at 0.001000.</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th style="text-align: right;">Observed units</th>
+<th style="text-align: right;">Expected units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>control</td>
+<td style="text-align: right;">932</td>
+<td style="text-align: right;">883.0</td>
+</tr>
+<tr>
+<td>treatment</td>
+<td style="text-align: right;">834</td>
+<td style="text-align: right;">883.0</td>
+</tr>
+</tbody>
+</table>
+<p>Exposure coverage: 100.00%. Control 100.00%; treatment 100.00%.
+Missing value: control 0.00%; treatment 0.00%.
+Missing quality: control 0.00%; treatment 0.00%.
+Missing retained: control 0.00%; treatment 0.00%.</p>
+<h2>Design</h2>
+<p>Effect equals the design threshold exactly.</p>
+<p>Frozen design hash: <code>43527b1efe0739f4d7e7ae62701a31cfa7bb936225c4d449c70edc4336db659c</code>.</p>
+<p>No changes to the registered design were recorded.</p>
+<table>
+<thead>
+<tr>
+<th>Registered parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primary metric</td>
+<td>value</td>
+</tr>
+<tr>
+<td>Baseline</td>
+<td>10.0000</td>
+</tr>
+<tr>
+<td>Relative MDE</td>
+<td>4.00%</td>
+</tr>
+<tr>
+<td>Alpha</td>
+<td>5.00%</td>
+</tr>
+<tr>
+<td>Requested power</td>
+<td>80.00%</td>
+</tr>
+<tr>
+<td>Planned units per arm</td>
+<td>883</td>
+</tr>
+<tr>
+<td>Planned days</td>
+<td>30</td>
+</tr>
+<tr>
+<td>Mixing variance</td>
+<td>0.1600</td>
+</tr>
+<tr>
+<td>control allocation</td>
+<td>50.00%</td>
+</tr>
+<tr>
+<td>treatment allocation</td>
+<td>50.00%</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Type</th>
+<th>Favorable direction</th>
+<th>Winsorization policy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Value per exposed unit</td>
+<td>mean</td>
+<td>higher_is_better</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Quality score</td>
+<td>mean</td>
+<td>higher_is_better</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Retention</td>
+<td>proportion</td>
+<td>higher_is_better</td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<h2>Primary metric</h2>
+<p>Intervals use the registered confidence level of 95.00%. Absolute effects are in metric units; relative effects are percent lift.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Absolute effect and interval</th>
+<th>Relative effect and interval</th>
+<th style="text-align: right;">p-value</th>
+<th style="text-align: right;">Control units</th>
+<th style="text-align: right;">Treatment units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Value per exposed unit</td>
+<td>0.3907 [0.1094, 0.6719]</td>
+<td>3.97% [1.06%, 6.88%]</td>
+<td style="text-align: right;">0.006505</td>
+<td style="text-align: right;">932</td>
+<td style="text-align: right;">834</td>
+</tr>
+</tbody>
+</table>
+<p>Standard error: 0.1434. Method: Welch t.
+Projected power at the registered effect and achieved sample: 79.88%. This is a design projection, not observed-effect evidence.
+Unit bootstrap cross check: 0.3907 [0.0718, 0.6549]. Resamples: 400; seed: 20260922.</p>
+<h2>Guardrails</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Absolute effect and interval</th>
+<th>Relative effect and interval</th>
+<th style="text-align: right;">Margin</th>
+<th>Verdict</th>
+<th style="text-align: right;">One-sided p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Quality score</td>
+<td>-0.1437 [-1.0685, 0.7811]</td>
+<td>-0.14% [-1.06%, 0.78%]</td>
+<td style="text-align: right;">5.00%</td>
+<td>pass</td>
+<td style="text-align: right;">1.91e-25</td>
+</tr>
+</tbody>
+</table>
+<p>Pass means the one-sided interval excludes degradation beyond the registered margin. Fail includes insufficient evidence of safety as well as demonstrated harm. Displayed two-sided effect intervals provide context; the verdict uses the one-sided test.</p>
+<h2>Variance</h2>
+<table>
+<thead>
+<tr>
+<th>Estimator</th>
+<th>Effect and interval</th>
+<th style="text-align: right;">Standard error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unadjusted</td>
+<td>0.3907 [0.1094, 0.6719]</td>
+<td style="text-align: right;">0.1434</td>
+</tr>
+<tr>
+<td>CUPED adjusted</td>
+<td>0.3955 [0.1146, 0.6764]</td>
+<td style="text-align: right;">0.1432</td>
+</tr>
+</tbody>
+</table>
+<p>Descriptive variance reduction: 0.22%. Equivalent sample multiplier: 1.00. Equivalent units saved: 4. These are variance-model planning equivalents, not additional observed users. The decision uses the registered unadjusted primary. Same-sample theta has small finite-sample bias; pre-period covariates must be unaffected by treatment.</p>
+<h2>Sequential</h2>
+<p>Normal-mixture mSPRT with estimated variance. This is an asymptotic approximation; calibration supports only the simulated regimes that were measured. Mixing variance: 0.1600.</p>
+<p>First sequential rejection day: 23. First naive rejection day: 13.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Final day</th>
+<th>Method</th>
+<th style="text-align: right;">Effect</th>
+<th>Current interval</th>
+<th style="text-align: right;">p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">30</td>
+<td>Sequential monitor, running-min p</td>
+<td style="text-align: right;">0.3907</td>
+<td>[-0.0446, 0.8259]</td>
+<td style="text-align: right;">0.012979</td>
+</tr>
+<tr>
+<td style="text-align: right;">30</td>
+<td>Naive daily comparison</td>
+<td style="text-align: right;">0.3907</td>
+<td>[0.1096, 0.6717]</td>
+<td style="text-align: right;">0.006439</td>
+</tr>
+</tbody>
+</table>
+<p>The sequential p-value retains the strongest evidence from any earlier look. The displayed band is the current, un-intersected interval, so it can include zero after an earlier sequential rejection. The naive p-value uses only the current look.</p>
+<h2>Secondary and segments</h2>
+<p>These are exploratory comparisons. Adjusted p-values are Benjamini-Hochberg corrections within separate secondary-metric and segment families. Pointwise intervals are not simultaneous confidence intervals.</p>
+<table>
+<thead>
+<tr>
+<th>Comparison</th>
+<th>Effect and interval</th>
+<th style="text-align: right;">Raw p-value</th>
+<th style="text-align: right;">Adjusted p-value</th>
+<th>Raw verdict</th>
+<th>Corrected verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Retention</td>
+<td>0.0219 [-0.0239, 0.0677]</td>
+<td style="text-align: right;">0.348236</td>
+<td style="text-align: right;">0.348236</td>
+<td>not significant</td>
+<td>not significant</td>
+</tr>
+<tr>
+<td>Segment desktop: Value per exposed unit</td>
+<td>0.5561 [0.0013, 1.1110]</td>
+<td style="text-align: right;">0.049455</td>
+<td style="text-align: right;">0.072582</td>
+<td>significant</td>
+<td>not significant</td>
+</tr>
+<tr>
+<td>Segment mobile: Value per exposed unit</td>
+<td>0.6088 [0.0787, 1.1389]</td>
+<td style="text-align: right;">0.024486</td>
+<td style="text-align: right;">0.072582</td>
+<td>significant</td>
+<td>not significant</td>
+</tr>
+<tr>
+<td>Segment new: Value per exposed unit</td>
+<td>-0.1831 [-0.7600, 0.3938]</td>
+<td style="text-align: right;">0.532944</td>
+<td style="text-align: right;">0.532944</td>
+<td>not significant</td>
+<td>not significant</td>
+</tr>
+<tr>
+<td>Segment returning: Value per exposed unit</td>
+<td>0.5826 [-0.0111, 1.1763]</td>
+<td style="text-align: right;">0.054436</td>
+<td style="text-align: right;">0.072582</td>
+<td>not significant</td>
+<td>not significant</td>
+</tr>
+</tbody>
+</table>
+<h2>Decision</h2>
+<p><strong>SHIP</strong></p>
+<p><strong>PROVISIONAL: the registered sample horizon has not been reached.</strong> This current fixed-horizon recommendation cannot authorize a launch. Achieved units: 932 control / 834 treatment. Registered targets: 883 control / 883 treatment.</p>
+<p>The primary interval excludes zero in the favorable direction and all guardrails pass.</p>
+<p>Registered rule:</p>
+<p>&gt; Blocked health blocks analysis. A failing guardrail gives no_ship. Otherwise ship when the primary interval excludes zero in the good direction. Otherwise no_ship when the interval excludes the MDE in the good direction. Otherwise extend using the design calculator. Guardrail, ship, futility, extend is the precedence.</p>
+<h2>Limitations</h2>
+<p>Simulations validate implementation under their stated data-generating assumptions. Exposure-conditioned comparisons require exposure independent of treatment and potential outcomes; conditioning on treatment-dependent exposure can bias causal effects. The platform does not identify interference or unmeasured post-randomization selection.
+- Exposure-conditioned analysis needs treatment-independent exposure and ignorable missingness.
+- Plug-in mSPRT monitoring is an asymptotic approximation, evaluated on the committed simulated distributions.
+- Segment and secondary metric families are adjusted separately using Benjamini-Hochberg; dependence assumptions still apply.
+- The primary decision uses the registered fixed horizon; daily fixed-horizon decisions must not become a stopping policy.</p>
+<h2>Reproduce</h2>
+<pre><code class="language-sh">uv run readout render at_mde
+</code></pre>
+<p>Restore the committed relational evidence first with <code>uv run python -m scripts.restore_evidence</code>, or regenerate every source scenario with <code>uv run python -m scripts.reset_and_rederive</code>.</p></main></body></html>

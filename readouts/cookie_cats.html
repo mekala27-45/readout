@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cookie Cats: moving the gate</title>
+<style>
+:root{color-scheme:light dark}body{max-width:1100px;margin:48px auto;padding:0 28px;font:16px/1.6 system-ui;background:#0b0f14;color:#fafafa}h1{font-size:42px;letter-spacing:-.04em}h2{padding-top:24px;border-top:1px solid #475569;color:#67e8f9}table{border-collapse:collapse;width:100%;font-size:13px;display:block;overflow:auto}td,th{border-bottom:1px solid #475569;padding:12px;text-align:left;font-variant-numeric:tabular-nums}code,pre{font-family:ui-monospace,monospace}pre{padding:20px;background:#17212d;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}a{color:#67e8f9}blockquote{border-left:3px solid #0891b2;margin-left:0;padding:12px 20px;background:#17212d}p,td{overflow-wrap:anywhere}@media print{body{background:white;color:#111;margin:0;max-width:none;font-size:11pt}h2{color:#111;break-after:avoid}pre,blockquote{background:#eee}table{display:table}tr{break-inside:avoid}a{color:#111}h1{font-size:26pt}}
+</style></head><body><main><h1>Cookie Cats: moving the gate</h1>
+<p>Source: <strong>public</strong>. Public randomized mobile-game assignment data, analyzed retrospectively.</p>
+<p>Analysis recorded: 2026-09-22T15:57:26.911681+00:00. Input fingerprint: <code>b8dd30e6dcf85e161498df86f02eea0cf28455bbb1f623687dc96b1ffa8bdfd7</code>.</p>
+<h2>Health</h2>
+<p>A p-value below the conventional SRM threshold triggers a warning; a p-value below the stricter platform threshold blocks analysis. Both outcomes remain visible. A warning permits analysis with a qualification.</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Status</th>
+<th style="text-align: right;">Statistic</th>
+<th style="text-align: right;">p-value</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>srm_assigned</td>
+<td>warn</td>
+<td style="text-align: right;">6.9024</td>
+<td style="text-align: right;">0.008608</td>
+<td>control is short by 394.5 units versus configured allocation; block below 0.001, warn below 0.05.</td>
+</tr>
+<tr>
+<td>srm_exposed</td>
+<td>warn</td>
+<td style="text-align: right;">6.9024</td>
+<td style="text-align: right;">0.008608</td>
+<td>control is short by 394.5 units versus configured allocation; block below 0.001, warn below 0.05.</td>
+</tr>
+<tr>
+<td>exposure</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Actual gate exposure is unobserved. All assigned players are included; the reported coverage is an analysis inclusion flag.</td>
+</tr>
+<tr>
+<td>missingness: retention_7</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Missing metric values or ratio denominators by exposed arm; primary and guardrail metrics require two valid units per arm. Complete-case analysis assumes ignorable missingness.</td>
+</tr>
+<tr>
+<td>missingness: retention_1</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Missing metric values or ratio denominators by exposed arm; primary and guardrail metrics require two valid units per arm. Complete-case analysis assumes ignorable missingness.</td>
+</tr>
+<tr>
+<td>missingness: rounds</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Missing metric values or ratio denominators by exposed arm; primary and guardrail metrics require two valid units per arm. Complete-case analysis assumes ignorable missingness.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>assigned allocation:</strong> conventional verdict <strong>warn</strong> at 0.050000; platform verdict <strong>pass</strong> at 0.001000.</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th style="text-align: right;">Observed units</th>
+<th style="text-align: right;">Expected units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>control</td>
+<td style="text-align: right;">44700</td>
+<td style="text-align: right;">45,094.5</td>
+</tr>
+<tr>
+<td>treatment</td>
+<td style="text-align: right;">45489</td>
+<td style="text-align: right;">45,094.5</td>
+</tr>
+</tbody>
+</table>
+<p><strong>exposed allocation:</strong> conventional verdict <strong>warn</strong> at 0.050000; platform verdict <strong>pass</strong> at 0.001000.</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th style="text-align: right;">Observed units</th>
+<th style="text-align: right;">Expected units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>control</td>
+<td style="text-align: right;">44700</td>
+<td style="text-align: right;">45,094.5</td>
+</tr>
+<tr>
+<td>treatment</td>
+<td style="text-align: right;">45489</td>
+<td style="text-align: right;">45,094.5</td>
+</tr>
+</tbody>
+</table>
+<p>Analysis inclusion: 100.00% of assigned players. Actual gate exposure was not observed; this is an assignment-effect analysis.
+Missing retention_7: control 0.00%; treatment 0.00%.
+Missing retention_1: control 0.00%; treatment 0.00%.
+Missing rounds: control 0.00%; treatment 0.00%.</p>
+<h2>Design</h2>
+<p>Retrospective reconstruction: moving the wait gate should improve seven-day retention by at least five percent relative, roughly one percentage point at the assumed planning baseline. This practical threshold and the rounds outlier policy were chosen with the public dataset already available; they are not historical pre-registration.</p>
+<p>Frozen design hash: <code>edf6ff5688b2c86a591fd9d668d3acc177610bda7914f9df1f37492e76d7d6f9</code>.</p>
+<p>This is a retrospective reconstruction registered before this platform&#x27;s analysis. It is not evidence of historical pre-registration by the experiment&#x27;s original team.
+No changes to the registered design were recorded.</p>
+<table>
+<thead>
+<tr>
+<th>Registered parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primary metric</td>
+<td>retention_7</td>
+</tr>
+<tr>
+<td>Baseline</td>
+<td>0.1900</td>
+</tr>
+<tr>
+<td>Relative MDE</td>
+<td>5.00%</td>
+</tr>
+<tr>
+<td>Alpha</td>
+<td>5.00%</td>
+</tr>
+<tr>
+<td>Requested power</td>
+<td>80.00%</td>
+</tr>
+<tr>
+<td>Planned units per arm</td>
+<td>27276</td>
+</tr>
+<tr>
+<td>Planned days</td>
+<td>14</td>
+</tr>
+<tr>
+<td>Mixing variance</td>
+<td>0.0001</td>
+</tr>
+<tr>
+<td>control allocation</td>
+<td>50.00%</td>
+</tr>
+<tr>
+<td>treatment allocation</td>
+<td>50.00%</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Type</th>
+<th>Favorable direction</th>
+<th>Winsorization policy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Seven-day retention</td>
+<td>proportion</td>
+<td>higher_is_better</td>
+<td>none</td>
+</tr>
+<tr>
+<td>One-day retention</td>
+<td>proportion</td>
+<td>higher_is_better</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Rounds played</td>
+<td>mean</td>
+<td>higher_is_better</td>
+<td>99.90%</td>
+</tr>
+</tbody>
+</table>
+<h2>Primary metric</h2>
+<p>Intervals use the registered confidence level of 95.00%. Absolute effects are in metric units; relative effects are percent lift.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Absolute effect and interval</th>
+<th>Relative effect and interval</th>
+<th style="text-align: right;">p-value</th>
+<th style="text-align: right;">Control units</th>
+<th style="text-align: right;">Treatment units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Seven-day retention</td>
+<td>-0.0082 [-0.0133, -0.0031]</td>
+<td>-4.31% [-6.92%, -1.70%]</td>
+<td style="text-align: right;">0.001554</td>
+<td style="text-align: right;">44700</td>
+<td style="text-align: right;">45489</td>
+</tr>
+</tbody>
+</table>
+<p>Standard error: 0.0026. Method: pooled two-sample z; unpooled Wald interval.
+Projected power at the registered effect and achieved sample: 94.97%. This is a design projection, not observed-effect evidence.
+Unit bootstrap cross check: -0.0082 [-0.0136, -0.0034]. Resamples: 400; seed: 20260922.</p>
+<h2>Guardrails</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Absolute effect and interval</th>
+<th>Relative effect and interval</th>
+<th style="text-align: right;">Margin</th>
+<th>Verdict</th>
+<th style="text-align: right;">One-sided p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One-day retention</td>
+<td>-0.0059 [-0.0124, 0.0006]</td>
+<td>-1.32% [-2.76%, 0.12%]</td>
+<td style="text-align: right;">3.00%</td>
+<td>pass</td>
+<td style="text-align: right;">0.010913</td>
+</tr>
+<tr>
+<td>Rounds played</td>
+<td>-0.0956 [-1.3735, 1.1822]</td>
+<td>-0.19% [-2.69%, 2.31%]</td>
+<td style="text-align: right;">5.00%</td>
+<td>pass</td>
+<td style="text-align: right;">8.15e-05</td>
+</tr>
+<tr>
+<td>Rounds played without winsorization</td>
+<td>-1.1575 [-3.7197, 1.4047]</td>
+<td>-2.21% [-7.00%, 2.58%]</td>
+<td style="text-align: right;">same registered margin</td>
+<td>sensitivity only</td>
+<td style="text-align: right;">not a separate decision</td>
+</tr>
+</tbody>
+</table>
+<p>Pass means the one-sided interval excludes degradation beyond the registered margin. Fail includes insufficient evidence of safety as well as demonstrated harm. Displayed two-sided effect intervals provide context; the verdict uses the one-sided test.
+Rounds played uses a pooled upper threshold of 1,073.6240. The threshold is estimated from these outcomes; the analytic interval conditions on that threshold.</p>
+<h2>Variance</h2>
+<p>CUPED not applicable: No complete pre-period covariate exists for this metric.</p>
+<h2>Sequential</h2>
+<p>Sequential monitoring not applicable: No longitudinal timestamps are available, or this is a ratio metric.</p>
+<h2>Secondary and segments</h2>
+<p>These are exploratory comparisons. Adjusted p-values are Benjamini-Hochberg corrections within separate secondary-metric and segment families. Pointwise intervals are not simultaneous confidence intervals.</p>
+<table>
+<thead>
+<tr>
+<th>Comparison</th>
+<th>Effect and interval</th>
+<th style="text-align: right;">Raw p-value</th>
+<th style="text-align: right;">Adjusted p-value</th>
+<th>Raw verdict</th>
+<th>Corrected verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Segment all: Seven-day retention</td>
+<td>-0.0082 [-0.0133, -0.0031]</td>
+<td style="text-align: right;">0.001554</td>
+<td style="text-align: right;">0.001554</td>
+<td>significant</td>
+<td>significant</td>
+</tr>
+</tbody>
+</table>
+<h2>Decision</h2>
+<p><strong>NO_SHIP</strong></p>
+<p>The primary interval excludes the pre-registered MDE in the favorable direction.</p>
+<p>Registered rule:</p>
+<p>&gt; ship: health passes, the primary interval excludes zero in the good direction, and every guardrail passes its margin; no_ship: any guardrail fails or the primary interval excludes the MDE in the good direction; extend: unresolved with additional sample from the power calculator; blocked: health fails.</p>
+<h2>Limitations</h2>
+<p>The source has no exposure timestamps or pre-period covariates. Allocation is observed at installation; actual gate exposure is unavailable. All randomized players are retained, so this readout estimates assignment effects. No temporal sequential monitor or CUPED result can be recovered from this file. The reconstructed design and outlier policy were chosen with public data already available.
+- Exposure-conditioned analysis needs treatment-independent exposure and ignorable missingness.
+- Plug-in mSPRT monitoring is an asymptotic approximation, evaluated on the committed simulated distributions.
+- Segment and secondary metric families are adjusted separately using Benjamini-Hochberg; dependence assumptions still apply.
+- The primary decision uses the registered fixed horizon; daily fixed-horizon decisions must not become a stopping policy.</p>
+<h2>Reproduce</h2>
+<pre><code class="language-sh">uv run readout render cookie_cats
+</code></pre>
+<p>Restore the committed relational evidence first with <code>uv run python -m scripts.restore_evidence</code>, or regenerate every source scenario with <code>uv run python -m scripts.reset_and_rederive</code>.</p></main></body></html>

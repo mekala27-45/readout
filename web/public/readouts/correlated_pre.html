@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Correlated pre-period</title>
+<style>
+:root{color-scheme:light dark}body{max-width:1100px;margin:48px auto;padding:0 28px;font:16px/1.6 system-ui;background:#0b0f14;color:#fafafa}h1{font-size:42px;letter-spacing:-.04em}h2{padding-top:24px;border-top:1px solid #475569;color:#67e8f9}table{border-collapse:collapse;width:100%;font-size:13px;display:block;overflow:auto}td,th{border-bottom:1px solid #475569;padding:12px;text-align:left;font-variant-numeric:tabular-nums}code,pre{font-family:ui-monospace,monospace}pre{padding:20px;background:#17212d;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}a{color:#67e8f9}blockquote{border-left:3px solid #0891b2;margin-left:0;padding:12px 20px;background:#17212d}p,td{overflow-wrap:anywhere}@media print{body{background:white;color:#111;margin:0;max-width:none;font-size:11pt}h2{color:#111;break-after:avoid}pre,blockquote{background:#eee}table{display:table}tr{break-inside:avoid}a{color:#111}h1{font-size:26pt}}
+</style></head><body><main><h1>Correlated pre-period</h1>
+<p>Source: <strong>simulated</strong>. A pre-period covariate predicts outcome variation; theoretical reduction is rho squared.
+Scenario: <code>correlated_pre</code>. Seed: 20260922.</p>
+<p>Analysis recorded: 2026-09-22T15:57:14.720956+00:00. Input fingerprint: <code>170b2cecd3c419bc070d55c0375a44c0530a1fac3bb0deac7189bba79054590c</code>.</p>
+<h2>Health</h2>
+<p>A p-value below the conventional SRM threshold triggers a warning; a p-value below the stricter platform threshold blocks analysis. Both outcomes remain visible. A warning permits analysis with a qualification.</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Status</th>
+<th style="text-align: right;">Statistic</th>
+<th style="text-align: right;">p-value</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>srm_assigned</td>
+<td>pass</td>
+<td style="text-align: right;">3.2013</td>
+<td style="text-align: right;">0.073578</td>
+<td>treatment is short by 49.0 units versus configured allocation; block below 0.001, warn below 0.05.</td>
+</tr>
+<tr>
+<td>srm_exposed</td>
+<td>pass</td>
+<td style="text-align: right;">3.2013</td>
+<td style="text-align: right;">0.073578</td>
+<td>treatment is short by 49.0 units versus configured allocation; block below 0.001, warn below 0.05.</td>
+</tr>
+<tr>
+<td>exposure</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Analysis conditions on exposure. Random assignment alone does not identify this effect if treatment changes exposure.</td>
+</tr>
+<tr>
+<td>missingness: value</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Missing metric values or ratio denominators by exposed arm; primary and guardrail metrics require two valid units per arm. Complete-case analysis assumes ignorable missingness.</td>
+</tr>
+<tr>
+<td>missingness: quality</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Missing metric values or ratio denominators by exposed arm; primary and guardrail metrics require two valid units per arm. Complete-case analysis assumes ignorable missingness.</td>
+</tr>
+<tr>
+<td>missingness: retained</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Missing metric values or ratio denominators by exposed arm; primary and guardrail metrics require two valid units per arm. Complete-case analysis assumes ignorable missingness.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>assigned allocation:</strong> conventional verdict <strong>pass</strong> at 0.050000; platform verdict <strong>pass</strong> at 0.001000.</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th style="text-align: right;">Observed units</th>
+<th style="text-align: right;">Expected units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>control</td>
+<td style="text-align: right;">1549</td>
+<td style="text-align: right;">1,500.0</td>
+</tr>
+<tr>
+<td>treatment</td>
+<td style="text-align: right;">1451</td>
+<td style="text-align: right;">1,500.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>exposed allocation:</strong> conventional verdict <strong>pass</strong> at 0.050000; platform verdict <strong>pass</strong> at 0.001000.</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th style="text-align: right;">Observed units</th>
+<th style="text-align: right;">Expected units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>control</td>
+<td style="text-align: right;">1549</td>
+<td style="text-align: right;">1,500.0</td>
+</tr>
+<tr>
+<td>treatment</td>
+<td style="text-align: right;">1451</td>
+<td style="text-align: right;">1,500.0</td>
+</tr>
+</tbody>
+</table>
+<p>Exposure coverage: 100.00%. Control 100.00%; treatment 100.00%.
+Missing value: control 0.00%; treatment 0.00%.
+Missing quality: control 0.00%; treatment 0.00%.
+Missing retained: control 0.00%; treatment 0.00%.</p>
+<h2>Design</h2>
+<p>A pre-period covariate predicts outcome variation; theoretical reduction is rho squared.</p>
+<p>Frozen design hash: <code>43527b1efe0739f4d7e7ae62701a31cfa7bb936225c4d449c70edc4336db659c</code>.</p>
+<p>No changes to the registered design were recorded.</p>
+<table>
+<thead>
+<tr>
+<th>Registered parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primary metric</td>
+<td>value</td>
+</tr>
+<tr>
+<td>Baseline</td>
+<td>10.0000</td>
+</tr>
+<tr>
+<td>Relative MDE</td>
+<td>4.00%</td>
+</tr>
+<tr>
+<td>Alpha</td>
+<td>5.00%</td>
+</tr>
+<tr>
+<td>Requested power</td>
+<td>80.00%</td>
+</tr>
+<tr>
+<td>Planned units per arm</td>
+<td>883</td>
+</tr>
+<tr>
+<td>Planned days</td>
+<td>30</td>
+</tr>
+<tr>
+<td>Mixing variance</td>
+<td>0.1600</td>
+</tr>
+<tr>
+<td>control allocation</td>
+<td>50.00%</td>
+</tr>
+<tr>
+<td>treatment allocation</td>
+<td>50.00%</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Type</th>
+<th>Favorable direction</th>
+<th>Winsorization policy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Value per exposed unit</td>
+<td>mean</td>
+<td>higher_is_better</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Quality score</td>
+<td>mean</td>
+<td>higher_is_better</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Retention</td>
+<td>proportion</td>
+<td>higher_is_better</td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<h2>Primary metric</h2>
+<p>Intervals use the registered confidence level of 95.00%. Absolute effects are in metric units; relative effects are percent lift.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Absolute effect and interval</th>
+<th>Relative effect and interval</th>
+<th style="text-align: right;">p-value</th>
+<th style="text-align: right;">Control units</th>
+<th style="text-align: right;">Treatment units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Value per exposed unit</td>
+<td>0.4442 [0.2275, 0.6610]</td>
+<td>4.45% [2.23%, 6.67%]</td>
+<td style="text-align: right;">6.01e-05</td>
+<td style="text-align: right;">1549</td>
+<td style="text-align: right;">1451</td>
+</tr>
+</tbody>
+</table>
+<p>Standard error: 0.1106. Method: Welch t.
+Projected power at the registered effect and achieved sample: 95.44%. This is a design projection, not observed-effect evidence.
+Unit bootstrap cross check: 0.4442 [0.2327, 0.6645]. Resamples: 400; seed: 20260922.</p>
+<h2>Guardrails</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Absolute effect and interval</th>
+<th>Relative effect and interval</th>
+<th style="text-align: right;">Margin</th>
+<th>Verdict</th>
+<th style="text-align: right;">One-sided p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Quality score</td>
+<td>-0.3843 [-1.1022, 0.3335]</td>
+<td>-0.38% [-1.10%, 0.33%]</td>
+<td style="text-align: right;">5.00%</td>
+<td>pass</td>
+<td style="text-align: right;">3.69e-37</td>
+</tr>
+</tbody>
+</table>
+<p>Pass means the one-sided interval excludes degradation beyond the registered margin. Fail includes insufficient evidence of safety as well as demonstrated harm. Displayed two-sided effect intervals provide context; the verdict uses the one-sided test.</p>
+<h2>Variance</h2>
+<table>
+<thead>
+<tr>
+<th>Estimator</th>
+<th>Effect and interval</th>
+<th style="text-align: right;">Standard error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unadjusted</td>
+<td>0.4442 [0.2275, 0.6610]</td>
+<td style="text-align: right;">0.1106</td>
+</tr>
+<tr>
+<td>CUPED adjusted</td>
+<td>0.4679 [0.3371, 0.5987]</td>
+<td style="text-align: right;">0.0667</td>
+</tr>
+</tbody>
+</table>
+<p>Descriptive variance reduction: 63.59%. Equivalent sample multiplier: 2.75. Equivalent units saved: 1,908. These are variance-model planning equivalents, not additional observed users. The decision uses the registered unadjusted primary. Same-sample theta has small finite-sample bias; pre-period covariates must be unaffected by treatment.</p>
+<h2>Sequential</h2>
+<p>Normal-mixture mSPRT with estimated variance. This is an asymptotic approximation; calibration supports only the simulated regimes that were measured. Mixing variance: 0.1600.</p>
+<p>First sequential rejection day: 14. First naive rejection day: 11.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Final day</th>
+<th>Method</th>
+<th style="text-align: right;">Effect</th>
+<th>Current interval</th>
+<th style="text-align: right;">p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">30</td>
+<td>Sequential monitor, running-min p</td>
+<td style="text-align: right;">0.4442</td>
+<td>[0.1071, 0.7813]</td>
+<td style="text-align: right;">0.002077</td>
+</tr>
+<tr>
+<td style="text-align: right;">30</td>
+<td>Naive daily comparison</td>
+<td style="text-align: right;">0.4442</td>
+<td>[0.2275, 0.6609]</td>
+<td style="text-align: right;">5.87e-05</td>
+</tr>
+</tbody>
+</table>
+<p>The sequential p-value retains the strongest evidence from any earlier look. The displayed band is the current, un-intersected interval, so it can include zero after an earlier sequential rejection. The naive p-value uses only the current look.</p>
+<h2>Secondary and segments</h2>
+<p>These are exploratory comparisons. Adjusted p-values are Benjamini-Hochberg corrections within separate secondary-metric and segment families. Pointwise intervals are not simultaneous confidence intervals.</p>
+<table>
+<thead>
+<tr>
+<th>Comparison</th>
+<th>Effect and interval</th>
+<th style="text-align: right;">Raw p-value</th>
+<th style="text-align: right;">Adjusted p-value</th>
+<th>Raw verdict</th>
+<th>Corrected verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Retention</td>
+<td>0.0213 [-0.0138, 0.0565]</td>
+<td style="text-align: right;">0.234514</td>
+<td style="text-align: right;">0.234514</td>
+<td>not significant</td>
+<td>not significant</td>
+</tr>
+<tr>
+<td>Segment desktop: Value per exposed unit</td>
+<td>0.4138 [-0.0090, 0.8365]</td>
+<td style="text-align: right;">0.055042</td>
+<td style="text-align: right;">0.110083</td>
+<td>not significant</td>
+<td>not significant</td>
+</tr>
+<tr>
+<td>Segment mobile: Value per exposed unit</td>
+<td>0.2329 [-0.2005, 0.6663]</td>
+<td style="text-align: right;">0.291742</td>
+<td style="text-align: right;">0.291742</td>
+<td>not significant</td>
+<td>not significant</td>
+</tr>
+<tr>
+<td>Segment new: Value per exposed unit</td>
+<td>0.8120 [0.3571, 1.2669]</td>
+<td style="text-align: right;">0.000486</td>
+<td style="text-align: right;">0.001944</td>
+<td>significant</td>
+<td>significant</td>
+</tr>
+<tr>
+<td>Segment returning: Value per exposed unit</td>
+<td>0.3303 [-0.0972, 0.7579]</td>
+<td style="text-align: right;">0.129740</td>
+<td style="text-align: right;">0.172987</td>
+<td>not significant</td>
+<td>not significant</td>
+</tr>
+</tbody>
+</table>
+<h2>Decision</h2>
+<p><strong>SHIP</strong></p>
+<p>The primary interval excludes zero in the favorable direction and all guardrails pass.</p>
+<p>Registered rule:</p>
+<p>&gt; Blocked health blocks analysis. A failing guardrail gives no_ship. Otherwise ship when the primary interval excludes zero in the good direction. Otherwise no_ship when the interval excludes the MDE in the good direction. Otherwise extend using the design calculator. Guardrail, ship, futility, extend is the precedence.</p>
+<h2>Limitations</h2>
+<p>Simulations validate implementation under their stated data-generating assumptions. Exposure-conditioned comparisons require exposure independent of treatment and potential outcomes; conditioning on treatment-dependent exposure can bias causal effects. The platform does not identify interference or unmeasured post-randomization selection.
+- Exposure-conditioned analysis needs treatment-independent exposure and ignorable missingness.
+- Plug-in mSPRT monitoring is an asymptotic approximation, evaluated on the committed simulated distributions.
+- Segment and secondary metric families are adjusted separately using Benjamini-Hochberg; dependence assumptions still apply.
+- The primary decision uses the registered fixed horizon; daily fixed-horizon decisions must not become a stopping policy.</p>
+<h2>Reproduce</h2>
+<pre><code class="language-sh">uv run readout render correlated_pre
+</code></pre>
+<p>Restore the committed relational evidence first with <code>uv run python -m scripts.restore_evidence</code>, or regenerate every source scenario with <code>uv run python -m scripts.reset_and_rederive</code>.</p></main></body></html>

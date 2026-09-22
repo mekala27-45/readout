@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Correlated sessions</title>
+<style>
+:root{color-scheme:light dark}body{max-width:1100px;margin:48px auto;padding:0 28px;font:16px/1.6 system-ui;background:#0b0f14;color:#fafafa}h1{font-size:42px;letter-spacing:-.04em}h2{padding-top:24px;border-top:1px solid #475569;color:#67e8f9}table{border-collapse:collapse;width:100%;font-size:13px;display:block;overflow:auto}td,th{border-bottom:1px solid #475569;padding:12px;text-align:left;font-variant-numeric:tabular-nums}code,pre{font-family:ui-monospace,monospace}pre{padding:20px;background:#17212d;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}a{color:#67e8f9}blockquote{border-left:3px solid #0891b2;margin-left:0;padding:12px 20px;background:#17212d}p,td{overflow-wrap:anywhere}@media print{body{background:white;color:#111;margin:0;max-width:none;font-size:11pt}h2{color:#111;break-after:avoid}pre,blockquote{background:#eee}table{display:table}tr{break-inside:avoid}a{color:#111}h1{font-size:26pt}}
+</style></head><body><main><h1>Correlated sessions</h1>
+<p>Source: <strong>simulated</strong>. Beta-binomial sessions share a user propensity; users remain the unit of inference.
+Scenario: <code>ratio_metric</code>. Seed: 20260922.</p>
+<p>Analysis recorded: 2026-09-22T15:57:15.395808+00:00. Input fingerprint: <code>64885fa388ec9c0ae353046490894683bd91c78967aac595566c290bc042705d</code>.</p>
+<h2>Health</h2>
+<p>A p-value below the conventional SRM threshold triggers a warning; a p-value below the stricter platform threshold blocks analysis. Both outcomes remain visible. A warning permits analysis with a qualification.</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Status</th>
+<th style="text-align: right;">Statistic</th>
+<th style="text-align: right;">p-value</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>srm_assigned</td>
+<td>warn</td>
+<td style="text-align: right;">5.3290</td>
+<td style="text-align: right;">0.020973</td>
+<td>treatment is short by 73.0 units versus configured allocation; block below 0.001, warn below 0.05.</td>
+</tr>
+<tr>
+<td>srm_exposed</td>
+<td>warn</td>
+<td style="text-align: right;">5.3290</td>
+<td style="text-align: right;">0.020973</td>
+<td>treatment is short by 73.0 units versus configured allocation; block below 0.001, warn below 0.05.</td>
+</tr>
+<tr>
+<td>exposure</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Analysis conditions on exposure. Random assignment alone does not identify this effect if treatment changes exposure.</td>
+</tr>
+<tr>
+<td>missingness: conversion_per_session</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Missing metric values or ratio denominators by exposed arm; primary and guardrail metrics require two valid units per arm. Complete-case analysis assumes ignorable missingness.</td>
+</tr>
+<tr>
+<td>missingness: quality</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Missing metric values or ratio denominators by exposed arm; primary and guardrail metrics require two valid units per arm. Complete-case analysis assumes ignorable missingness.</td>
+</tr>
+<tr>
+<td>missingness: retained</td>
+<td>pass</td>
+<td style="text-align: right;">unavailable</td>
+<td style="text-align: right;">unavailable</td>
+<td>Missing metric values or ratio denominators by exposed arm; primary and guardrail metrics require two valid units per arm. Complete-case analysis assumes ignorable missingness.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>assigned allocation:</strong> conventional verdict <strong>warn</strong> at 0.050000; platform verdict <strong>pass</strong> at 0.001000.</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th style="text-align: right;">Observed units</th>
+<th style="text-align: right;">Expected units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>control</td>
+<td style="text-align: right;">2073</td>
+<td style="text-align: right;">2,000.0</td>
+</tr>
+<tr>
+<td>treatment</td>
+<td style="text-align: right;">1927</td>
+<td style="text-align: right;">2,000.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>exposed allocation:</strong> conventional verdict <strong>warn</strong> at 0.050000; platform verdict <strong>pass</strong> at 0.001000.</p>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th style="text-align: right;">Observed units</th>
+<th style="text-align: right;">Expected units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>control</td>
+<td style="text-align: right;">2073</td>
+<td style="text-align: right;">2,000.0</td>
+</tr>
+<tr>
+<td>treatment</td>
+<td style="text-align: right;">1927</td>
+<td style="text-align: right;">2,000.0</td>
+</tr>
+</tbody>
+</table>
+<p>Exposure coverage: 100.00%. Control 100.00%; treatment 100.00%.
+Missing conversion_per_session: control 0.00%; treatment 0.00%.
+Missing quality: control 0.00%; treatment 0.00%.
+Missing retained: control 0.00%; treatment 0.00%.</p>
+<h2>Design</h2>
+<p>Beta-binomial sessions share a user propensity; users remain the unit of inference.</p>
+<p>Frozen design hash: <code>3574432d060c5280a4e2cd4b64f5d63bf812a06d1f182f0e081813686c5edb4e</code>.</p>
+<p>No changes to the registered design were recorded.</p>
+<table>
+<thead>
+<tr>
+<th>Registered parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primary metric</td>
+<td>conversion_per_session</td>
+</tr>
+<tr>
+<td>Baseline</td>
+<td>0.4000</td>
+</tr>
+<tr>
+<td>Relative MDE</td>
+<td>5.00%</td>
+</tr>
+<tr>
+<td>Alpha</td>
+<td>5.00%</td>
+</tr>
+<tr>
+<td>Requested power</td>
+<td>80.00%</td>
+</tr>
+<tr>
+<td>Planned units per arm</td>
+<td>2000</td>
+</tr>
+<tr>
+<td>Planned days</td>
+<td>30</td>
+</tr>
+<tr>
+<td>Mixing variance</td>
+<td>0.1600</td>
+</tr>
+<tr>
+<td>control allocation</td>
+<td>50.00%</td>
+</tr>
+<tr>
+<td>treatment allocation</td>
+<td>50.00%</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Type</th>
+<th>Favorable direction</th>
+<th>Winsorization policy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Conversion per session</td>
+<td>ratio</td>
+<td>higher_is_better</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Quality score</td>
+<td>mean</td>
+<td>higher_is_better</td>
+<td>none</td>
+</tr>
+<tr>
+<td>Retention</td>
+<td>proportion</td>
+<td>higher_is_better</td>
+<td>none</td>
+</tr>
+</tbody>
+</table>
+<h2>Primary metric</h2>
+<p>Intervals use the registered confidence level of 95.00%. Absolute effects are in metric units; relative effects are percent lift.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Absolute effect and interval</th>
+<th>Relative effect and interval</th>
+<th style="text-align: right;">p-value</th>
+<th style="text-align: right;">Control units</th>
+<th style="text-align: right;">Treatment units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Conversion per session</td>
+<td>0.0275 [0.0093, 0.0458]</td>
+<td>6.90% [2.18%, 11.63%]</td>
+<td style="text-align: right;">0.003095</td>
+<td style="text-align: right;">2073</td>
+<td style="text-align: right;">1927</td>
+</tr>
+</tbody>
+</table>
+<p>Standard error: 0.0093. Method: unit delta method.</p>
+<h2>Guardrails</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Absolute effect and interval</th>
+<th>Relative effect and interval</th>
+<th style="text-align: right;">Margin</th>
+<th>Verdict</th>
+<th style="text-align: right;">One-sided p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Quality score</td>
+<td>0.4255 [-0.1867, 1.0376]</td>
+<td>0.43% [-0.19%, 1.04%]</td>
+<td style="text-align: right;">5.00%</td>
+<td>pass</td>
+<td style="text-align: right;">5.03e-67</td>
+</tr>
+</tbody>
+</table>
+<p>Pass means the one-sided interval excludes degradation beyond the registered margin. Fail includes insufficient evidence of safety as well as demonstrated harm. Displayed two-sided effect intervals provide context; the verdict uses the one-sided test.</p>
+<h2>Variance</h2>
+<p>CUPED not applicable: No complete pre-period covariate exists for this metric.</p>
+<h2>Sequential</h2>
+<p>Sequential monitoring not applicable: No longitudinal timestamps are available, or this is a ratio metric.</p>
+<h2>Secondary and segments</h2>
+<p>These are exploratory comparisons. Adjusted p-values are Benjamini-Hochberg corrections within separate secondary-metric and segment families. Pointwise intervals are not simultaneous confidence intervals.</p>
+<table>
+<thead>
+<tr>
+<th>Comparison</th>
+<th>Effect and interval</th>
+<th style="text-align: right;">Raw p-value</th>
+<th style="text-align: right;">Adjusted p-value</th>
+<th>Raw verdict</th>
+<th>Corrected verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Retention</td>
+<td>0.0228 [-0.0076, 0.0532]</td>
+<td style="text-align: right;">0.141186</td>
+<td style="text-align: right;">0.141186</td>
+<td>not significant</td>
+<td>not significant</td>
+</tr>
+<tr>
+<td>Segment desktop: Conversion per session</td>
+<td>0.0382 [0.0012, 0.0751]</td>
+<td style="text-align: right;">0.042882</td>
+<td style="text-align: right;">0.085764</td>
+<td>significant</td>
+<td>not significant</td>
+</tr>
+<tr>
+<td>Segment mobile: Conversion per session</td>
+<td>0.0175 [-0.0200, 0.0550]</td>
+<td style="text-align: right;">0.360660</td>
+<td style="text-align: right;">0.480880</td>
+<td>not significant</td>
+<td>not significant</td>
+</tr>
+<tr>
+<td>Segment new: Conversion per session</td>
+<td>0.0587 [0.0239, 0.0934]</td>
+<td style="text-align: right;">0.000951</td>
+<td style="text-align: right;">0.003804</td>
+<td>significant</td>
+<td>significant</td>
+</tr>
+<tr>
+<td>Segment returning: Conversion per session</td>
+<td>-0.0065 [-0.0432, 0.0303]</td>
+<td style="text-align: right;">0.730544</td>
+<td style="text-align: right;">0.730544</td>
+<td>not significant</td>
+<td>not significant</td>
+</tr>
+</tbody>
+</table>
+<h2>Decision</h2>
+<p><strong>SHIP</strong></p>
+<p><strong>PROVISIONAL: the registered sample horizon has not been reached.</strong> This current fixed-horizon recommendation cannot authorize a launch. Achieved units: 2073 control / 1927 treatment. Registered targets: 2000 control / 2000 treatment.</p>
+<p>The primary interval excludes zero in the favorable direction and all guardrails pass.</p>
+<p>Registered rule:</p>
+<p>&gt; Blocked health blocks analysis. A failing guardrail gives no_ship. Otherwise ship when the primary interval excludes zero in the good direction. Otherwise no_ship when the interval excludes the MDE in the good direction. Otherwise extend using the design calculator. Guardrail, ship, futility, extend is the precedence.</p>
+<h2>Limitations</h2>
+<p>Simulations validate implementation under their stated data-generating assumptions. Exposure-conditioned comparisons require exposure independent of treatment and potential outcomes; conditioning on treatment-dependent exposure can bias causal effects. The platform does not identify interference or unmeasured post-randomization selection.
+- Exposure-conditioned analysis needs treatment-independent exposure and ignorable missingness.
+- Plug-in mSPRT monitoring is an asymptotic approximation, evaluated on the committed simulated distributions.
+- Segment and secondary metric families are adjusted separately using Benjamini-Hochberg; dependence assumptions still apply.
+- The primary decision uses the registered fixed horizon; daily fixed-horizon decisions must not become a stopping policy.</p>
+<h2>Reproduce</h2>
+<pre><code class="language-sh">uv run readout render ratio_metric
+</code></pre>
+<p>Restore the committed relational evidence first with <code>uv run python -m scripts.restore_evidence</code>, or regenerate every source scenario with <code>uv run python -m scripts.reset_and_rederive</code>.</p></main></body></html>

@@ -1,0 +1,21 @@
+{
+  "python_tests": {
+    "tests": "101",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "30.068"
+  },
+  "coverage": {
+    "lines-valid": "1464",
+    "lines-covered": "1404",
+    "line-rate": "0.959"
+  },
+  "real_postgres_required": true,
+  "ruff": "pass",
+  "mypy_strict_files": 44,
+  "frontend_golden_tests": 3,
+  "independent_process_persistence": "pass",
+  "runtime": "Linux Docker Python 3.12",
+  "public_api_deployed": false
+}
