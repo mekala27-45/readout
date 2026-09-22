@@ -1,0 +1,23 @@
+name: Deploy API to an existing Fly allowance
+on:
+  workflow_dispatch:
+    inputs:
+      zero_cost_allowance_verified:
+        description: Existing Fly allowance has been verified to cover this app without charges
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+jobs:
+  deploy:
+    if: inputs.zero_cost_allowance_verified
+    runs-on: ubuntu-latest
+    environment: api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only --app "$FLY_APP"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_APP: ${{ vars.FLY_APP }}
