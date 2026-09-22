@@ -12,7 +12,7 @@ export function Upload() {
   const [output, setOutput] = useState<Row | null>(null);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!file) return;
+    if (!API || !file) return;
     setPending(true);
     setError("");
     const body = new FormData();
@@ -72,11 +72,23 @@ export function Upload() {
         description="Upload assignments and outcomes. The platform checks health before computing a result."
       />
       <div className="upload-layout">
-        <form className="input-card" onSubmit={submit}>
+        <form
+          className="input-card"
+          onSubmit={submit}
+          aria-describedby={!API ? "upload-api-notice" : undefined}
+        >
           <div className="panel-title">
             <h2>Experiment data</h2>
             <span className="tag">CSV</span>
           </div>
+          {!API && (
+            <div className="notice" id="upload-api-notice" role="status">
+              <p>
+                This published view shows stored results. CSV analysis needs a
+                connected live API, which is not configured for this view.
+              </p>
+            </div>
+          )}
           <label className="upload-zone">
             <Icon name="upload" size={30} />
             <strong>{file ? file.name : "Choose your experiment CSV"}</strong>
@@ -85,6 +97,7 @@ export function Upload() {
               type="file"
               accept=".csv,text/csv"
               required
+              disabled={!API}
               aria-label="Choose experiment CSV"
               onChange={(e) => {
                 setFile(e.target.files?.[0] ?? null);
@@ -96,6 +109,7 @@ export function Upload() {
             Experiment name
             <input
               value={name}
+              disabled={!API}
               placeholder="Checkout conversion experiment"
               onChange={(e) => setName(e.target.value)}
             />
@@ -105,6 +119,7 @@ export function Upload() {
             <input
               type="password"
               value={token}
+              disabled={!API}
               placeholder="Local default or deployed API token"
               autoComplete="off"
               onChange={(e) => setToken(e.target.value)}
@@ -116,7 +131,10 @@ export function Upload() {
               session and is sent only to the configured API.
             </p>
           </div>
-          <button className="button primary full" disabled={pending || !file}>
+          <button
+            className="button primary full"
+            disabled={!API || pending || !file}
+          >
             {pending
               ? "Running health checks and analysis..."
               : "Analyze and create readout"}

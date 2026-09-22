@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { api, fmt, rec, Row, rows, str } from "@/lib/data";
+import { API, api, fmt, rec, Row, rows, str } from "@/lib/data";
 import { Icon, PageHead, useBundle } from "./shell";
 import { ChartCard, DataTable, SeriesChart } from "./charts";
 export function Assignment() {
@@ -17,6 +17,7 @@ export function Assignment() {
   }));
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!API) return;
     setError("");
     setLoading(true);
     try {
@@ -44,13 +45,26 @@ export function Assignment() {
         <section className="input-card">
           <div className="panel-title">
             <h2>Try an assignment</h2>
-            <span className="tag">LIVE API</span>
+            <span className="tag">{API ? "LIVE API" : "API NOT CONFIGURED"}</span>
           </div>
-          <form onSubmit={submit}>
+          {!API && (
+            <div className="notice" id="assignment-api-notice" role="status">
+              <p>
+                Assignment lookup needs a connected live API, which is not
+                configured for this published view. The measured assignment
+                histogram remains available below.
+              </p>
+            </div>
+          )}
+          <form
+            onSubmit={submit}
+            aria-describedby={!API ? "assignment-api-notice" : undefined}
+          >
             <label className="text-field">
               Experiment
               <select
                 value={experiment}
+                disabled={!API}
                 onChange={(e) => setExperiment(e.target.value)}
               >
                 {bundle?.experiments.map((m) => (
@@ -67,13 +81,17 @@ export function Assignment() {
               Unit ID
               <input
                 value={unit}
+                disabled={!API}
                 required
                 maxLength={500}
                 onChange={(e) => setUnit(e.target.value)}
                 autoComplete="off"
               />
             </label>
-            <button className="button primary full" disabled={loading || !unit}>
+            <button
+              className="button primary full"
+              disabled={!API || loading || !unit}
+            >
               {loading ? "Computing assignment..." : "Resolve assignment"}
               <Icon name="arrow" size={16} />
             </button>
@@ -95,14 +113,20 @@ export function Assignment() {
               <code>
                 {assignment
                   ? str(assignment.hash)
-                  : "Submit a unit to inspect its SHA-256 hash"}
+                  : API
+                    ? "Submit a unit to inspect its SHA-256 hash"
+                    : "Connect a live API to inspect an assignment"}
               </code>
             </div>
             <i>↓</i>
             <div>
               <span>02 / BUCKET</span>
               <strong>
-                {assignment ? fmt(assignment.bucket, 0) : "Pending"}
+                {assignment
+                  ? fmt(assignment.bucket, 0)
+                  : API
+                    ? "Pending"
+                    : "Unavailable"}
               </strong>
               <small>First eight hexadecimal characters, modulo 10,000</small>
             </div>
@@ -114,7 +138,11 @@ export function Assignment() {
                   assignment?.variant === "treatment" ? "treatment-text" : ""
                 }
               >
-                {assignment ? str(assignment.variant) : "Pending"}
+                {assignment
+                  ? str(assignment.variant)
+                  : API
+                    ? "Pending"
+                    : "Unavailable"}
               </strong>
               <small>Mapped using the experiment allocation</small>
             </div>
