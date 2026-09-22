@@ -1,16 +1,19 @@
 # Measured results
 
-Computed at {{ generated_at }} from stored relational records. Every simulation is labeled by scenario and seed in its manifest. Public Cookie Cats observations are analyzed separately.
+Computed at {{ generated_at }} from stored relational records. Every simulation is labeled by scenario and seed in its manifest. Public Cookie Cats observations are analyzed separately. Calibration seed: {{ calibration.seed }}; null replicates: {{ calibration.peeking_replicates }}; validation replicates per setting: {{ calibration.validation_replicates }}. Rate bands are Wilson Monte Carlo intervals.
 
 ## Peeking calibration
 
-Source: simulated true null. Seed and configuration: {{ calibration.get('config', calibration.get('metadata', {}))|tojson }}.
+Source: simulated true null, normal unit outcomes. A detection means at least one rejection by that day.
 
 | Daily checks | Naive false positive rate and interval | Sequential false positive rate and interval |
 | ---: | --- | --- |
 {% for row in calibration.peeking %}
 | {{ row.day }} | {{ row.naive|band }} | {{ row.sequential|band }} |
 {% endfor %}
+
+{% set binary = calibration.peeking_proportion[-1] %}
+Independent Bernoulli null validation, day {{ binary.day }}: naive **{{ binary.naive|band }}**, sequential **{{ binary.sequential|band }}**. The plug-in mSPRT is an asymptotic approximation; these measurements do not establish a universal finite-sample guarantee.
 
 ## Empirical power
 
@@ -19,7 +22,15 @@ Source: simulated effect exactly at the registered MDE. Counts come from engine 
 | Design multiple | Sample per arm | Empirical power and interval | Theoretical power |
 | ---: | ---: | --- | ---: |
 {% for row in calibration.power %}
-| {{ row.get('multiple', row.get('multiplier')) }} | {{ row.get('n_per_arm') }} | {{ row.get('empirical', row)|band }} | {{ row.get('theoretical', row.get('theoretical_power'))|percent }} |
+| {{ row.multiple }} | {{ row.n_per_arm }} | {{ row|band }} | {{ row.theoretical|percent }} |
+{% endfor %}
+
+The separate Bernoulli validation uses the same sample-size multiples:
+
+| Design multiple | Sample per arm | Empirical power and interval | Theoretical power |
+| ---: | ---: | --- | ---: |
+{% for row in calibration.power_proportion %}
+| {{ row.multiple }} | {{ row.n_per_arm }} | {{ row|band }} | {{ row.theoretical|percent }} |
 {% endfor %}
 
 ## SRM sensitivity
@@ -29,46 +40,76 @@ Source: simulated assignment dropout. Detection means crossing the platform bloc
 | Initial sample per arm | Treatment dropout | Blocking probability and interval |
 | ---: | ---: | --- |
 {% for row in calibration.srm %}
-| {{ row.get('n_per_arm') }} | {{ row.get('dropout')|percent }} | {{ row.get('detection', row)|band }} |
+| {{ row.n_per_arm }} | {{ row.dropout|percent }} | {{ row|band }} |
 {% endfor %}
 
 ## Pricepoint reproduction
 
-```json
-{{ pricepoint|json }}
-```
+| Assumption or result | Stored value |
+| --- | --- |
+| Assumed elasticity | {{ pricepoint.assumed_elasticity|number(2) }} |
+| Price change | {{ pricepoint.price_change|percent }} |
+| Effect magnitude | {{ pricepoint.effect_absolute|number(8) }} |
+| Effect scale | {{ pricepoint.effect_scale }} |
+| Residual standard deviation | {{ pricepoint.standard_deviation|number(8) }} |
+| Alpha | {{ pricepoint.alpha|percent }} |
+| Requested power | {{ pricepoint.power|percent }} |
+| Published sample per arm | {{ pricepoint.published_n_per_arm }} |
+| Reproduced sample per arm | {{ pricepoint.n_per_arm }} |
 
-The source assumes independent product-week observations on a transformed demand scale. Serial dependence, substitution and interference can raise the actual sample requirement. This reproduction checks arithmetic, not identification or independence.
+Source: `{{ pricepoint.source }}`, source commit `{{ pricepoint.source_commit }}`. {{ pricepoint.documentation_gap }} The reproduction checks arithmetic, not identification or independence. Test: `test_reproduces_pricepoint_power`.
 
 ## CUPED recovery
 
-Source: simulated correlated pre-period values. Empirical effect sampling distributions and variance reduction:
+Source: simulated correlated pre-period values. The empirical variance reduction below compares the spread of effect estimates across independent experiments. Its paired bootstrap interval does not use the engine's variance formula.
 
-```json
-{{ calibration.get('cuped', {})|json }}
-```
+{% set cuped = calibration.cuped %}
+| Quantity | Estimate and uncertainty or registered truth |
+| --- | --- |
+| True effect | {{ cuped.true_effect|number }} |
+| Mean adjusted effect across replicates | {{ cuped|interval }} |
+| Expected variance reduction from squared correlation | {{ cuped.expected_reduction|percent }} |
+| Empirical variance reduction across replicates | {{ cuped.empirical_variance_reduction|percent }} [{{ cuped.empirical_low|percent }}, {{ cuped.empirical_high|percent }}] |
+| Mean engine-reported reduction, descriptive | {{ cuped.variance_reduction|percent }} [{{ cuped.low|percent }}, {{ cuped.high|percent }}] |
+
+Bootstrap draws: {{ cuped.bootstrap_draws }}. The full replicate-level estimates remain in the committed results bundle for the recovery distribution chart.
 
 ## Ratio interval coverage
 
 Source: simulated sessions correlated within randomized users. Delta intervals preserve the user as the sampling unit; the naive comparison treats sessions as independent.
 
-```json
-{{ calibration.get('delta', {})|json }}
-```
+{% set ratio = calibration.delta %}
+| Method | Coverage and Monte Carlo interval |
+| --- | --- |
+| Registered nominal target | {{ ratio.nominal|percent }} |
+| Unit delta method | {{ ratio.delta|band }} |
+| Naive independent sessions | {{ ratio.naive|band }} |
+
+True effect: {{ ratio.true_effect|number }}; randomized units per arm: {{ ratio.n_per_arm }}; within-user correlation: {{ ratio.intraclass_correlation|number(2) }}. Ratio power planning and ratio sequential monitoring are outside this implementation.
 
 ## Exposure dilution
 
 Source: simulated exposure independent of assignment and potential outcomes. This specific generator supports the exposure-conditioned comparison; arbitrary real exposure does not.
 
-```json
-{{ calibration.get('exposure', {})|json }}
-```
+{% set exposure = calibration.exposure %}
+| Estimand | Expected effect | Observed effect and interval | Control units | Treatment units |
+| --- | ---: | --- | ---: | ---: |
+| All assigned units | {{ exposure.expected_itt_effect|number }} | {{ exposure.assigned|interval }} | {{ exposure.assigned.n_control }} | {{ exposure.assigned.n_treatment }} |
+| Exposed units | {{ exposure.true_effect|number }} | {{ exposure.exposed|interval }} | {{ exposure.exposed.n_control }} | {{ exposure.exposed.n_treatment }} |
+
+Exposure rate: {{ exposure.exposure_rate|percent }}. Seed: {{ exposure.seed }}. {{ exposure.assumption }}
 
 ## Mixing-variance sensitivity
 
-```json
-{{ calibration.get('mixing_sensitivity', calibration.get('sensitivity', {}))|json }}
-```
+Source: simulated effect at the MDE, sharing the same experiments across mixing settings. Day summaries are conditional on rejection; unrejected experiments remain in the denominator of the rejection rate.
+
+| Mixing variance | Rejection rate and interval | First rejection day: median [interquartile range] | Not rejected |
+| ---: | --- | ---: | ---: |
+{% for row in calibration.mixing_sensitivity %}
+| {{ row.mixing_variance|number }} | {{ row|band }} | {{ row.median_rejection_day }} [{{ row.get('rejection_day_q25', 'unavailable') }}, {{ row.get('rejection_day_q75', 'unavailable') }}] | {{ row.not_rejected }} |
+{% endfor %}
+
+The bundle retains the full first-rejection-day histogram for every setting.
 
 ## Decisions across sources
 
@@ -76,15 +117,15 @@ Source: simulated exposure independent of assignment and potential outcomes. Thi
 | --- | --- | --- | --- | --- |
 {% for manifest in experiments %}
 {% set r = manifest.run.results %}
-| {{ manifest.experiment.key }} | {{ manifest.experiment.source }} | {{ manifest.health|map(attribute='status')|join(', ') }} | {{ r.decision.decision }} | {{ r.primary|interval if r.get('primary') else 'blocked; no metrics' }} |
+| {{ manifest.experiment.key }} | {{ manifest.experiment.source }} | {{ manifest.health|map(attribute='status')|unique|join(', ') }} | {{ r.decision.decision }}{% if r.decision.get('provisional') %} (provisional){% endif %} | {{ r.primary|interval if r.get('primary') else 'blocked; no metrics' }} |
 {% endfor %}
 
 ## Cookie Cats
 
 {% for manifest in experiments if manifest.experiment.key == 'cookie_cats' %}
 {% set r = manifest.run.results %}
-{% for check in manifest.health if check.get('check', check.kind) in ['srm_assigned','srm_exposed'] %}
-{{ check.get('check', check.kind) }}: conventional **{{ check.get('conventional_verdict') }}**, platform **{{ check.get('blocking_verdict') }}**, p = {{ check.get('p_value')|number(6) }}. Observed {{ check.get('observed')|tojson }}, expected {{ check.get('expected')|tojson }}. The platform records the conventional warning while reserving blocking for stronger mismatch evidence.
+{% for check in manifest.health if check.get('check', check.get('kind')) in ['srm_assigned','srm_exposed'] %}
+{{ check.get('check', check.get('kind')) }}: conventional **{{ check.get('conventional_verdict') }}**, platform **{{ check.get('blocking_verdict') }}**, p = {{ check.get('p_value')|pvalue }}. Observed {{ check.get('observed')|tojson }}, expected {{ check.get('expected')|tojson }}. The platform records the conventional warning while reserving blocking for stronger mismatch evidence.
 {% endfor %}
 
 {% if r.get('primary') %}
@@ -98,15 +139,26 @@ Primary retention effect: **{{ r.primary|interval }}**, relative **{{ r.primary|
 {% endfor %}
 {% endfor %}
 
-Data diagnostics: {{ manifest.experiment.source_detail|tojson }}.
+{% set source = manifest.experiment.source_detail %}
+| Source diagnostic | Stored value |
+| --- | --- |
+| Rows | {{ source.get('rows') }} |
+| Largest rounds value | {{ source.get('maximum_rounds') }} |
+| Declared pooled rounds threshold | {{ source.get('rounds_upper_quantile')|number }} |
+| Retrieved at | {{ source.get('retrieved_at') }} |
+| Source | {{ source.get('source_url') }} |
+| SHA-256 | `{{ source.get('sha256') }}` |
+
+{{ source.get('exposure_note', '') }} {{ source.get('license_note', '') }}
 {% endif %}
 {% endfor %}
 
 ## Assignment evidence
 
-```json
-{{ assignment|json }}
-```
+Deterministic IDs checked: {{ assignment.get('units') }}. Histogram population: {{ assignment.get('histogram_units') }}. Independent-salt assignment correlation: {{ assignment.get('salt_correlation')|number(6) }}.
+{% if assignment.get('uniformity') %}
+Allocation goodness-of-fit p-value: {{ assignment.uniformity.p_value|pvalue }}; verdict **{{ assignment.uniformity.status }}**. Observed control: {{ assignment.get('counts', {}).get('control') }}; treatment: {{ assignment.get('counts', {}).get('treatment') }}.
+{% endif %}
 
 ## Limitations
 

@@ -1,6 +1,7 @@
 """The product and publication gates fail closed on empty or inconsistent evidence."""
 
 import copy
+import hashlib
 import shutil
 from pathlib import Path
 from typing import Any
@@ -154,3 +155,40 @@ def test_renderer_refuses_forbidden_punctuation(manifest: dict[str, Any]) -> Non
     manifest["experiment"]["name"] = chr(0x2014)
     with pytest.raises(ValueError, match="Forbidden punctuation"):
         render_manifest(manifest)
+
+
+def test_renderer_preserves_fdr_and_raw_sensitivity(manifest: dict[str, Any]) -> None:
+    results = manifest["run"]["results"]
+    metric = {
+        **results["primary"],
+        "segment": "returning",
+        "p_adjusted": 0.012345,
+        "significant": True,
+        "significant_adjusted": True,
+    }
+    results["segments"] = [metric]
+    results["guardrails"] = [
+        {**metric, "margin": 0.05, "passed": True, "noninferiority_p_value": 1e-8}
+    ]
+    results["raw_metrics"] = [{**metric, "estimate": 0.3, "ci_low": 0.1, "ci_high": 0.5}]
+    text = render_manifest(manifest)["markdown"]
+    assert "Segment returning: Value" in text
+    assert "0.012345" in text
+    assert "Value without winsorization | 0.3000 [0.1000, 0.5000]" in text
+    assert "1e-08" in text
+
+
+def test_claim_gate_checks_stored_readout_digest(tmp_path: Path, manifest: dict[str, Any]) -> None:
+    shutil.copytree(ROOT / "readouts/templates", tmp_path / "readouts/templates")
+    folder = tmp_path / "docs/templates"
+    folder.mkdir(parents=True)
+    (folder / "README.md.jinja").write_text("Measured: {{ calibration.measured }}\n")
+    repository = Records(manifest)
+    text = render_manifest(manifest, tmp_path)["markdown"]
+    manifest["decision"]["rendered_readout_sha256"] = hashlib.sha256(text.encode()).hexdigest()
+    assert publish(repository, tmp_path, write=True) == []
+    assert publish(repository, tmp_path) == []
+    manifest["decision"]["rendered_readout_sha256"] = "incorrect"
+    assert any("Stored readout digest differs" in error for error in publish(repository, tmp_path))
+    manifest["decision"]["rendered_readout_sha256"] = None
+    assert any("Missing stored readout digest" in error for error in publish(repository, tmp_path))

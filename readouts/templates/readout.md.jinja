@@ -1,17 +1,41 @@
 # {{ experiment.name }}
 
 Source: **{{ experiment.source }}**. {{ experiment.get('source_detail', {}).get('description', '') }}
+{% if experiment.source == 'simulated' %}
+Scenario: `{{ experiment.get('source_detail', {}).get('scenario', experiment.key) }}`. Seed: {{ experiment.get('source_detail', {}).get('seed', 'unavailable') }}.
+{% endif %}
 
 Analysis recorded: {{ run.ran_at }}. Input fingerprint: `{{ run.get('inputs_hash', 'unavailable') }}`.
 
 ## Health
 
-The conventional SRM threshold produces a warning; the stricter platform threshold blocks analysis. Both outcomes remain visible. A warning permits analysis with a qualification.
+The conventional SRM threshold warns; the stricter platform threshold blocks. Both outcomes remain visible. A warning permits analysis with a qualification.
 
 | Check | Status | Statistic | p-value | Details |
 | --- | --- | ---: | ---: | --- |
 {% for check in health %}
-| {{ check.kind }} | {{ check.status }} | {{ check.get('statistic')|number }} | {{ check.get('p_value')|number(6) }} | {{ check.get('detail', {})|tojson }} |
+| {{ check.get('kind', check.get('check', 'health')) }}{% if check.get('metric_key') %}: {{ check.metric_key }}{% endif %} | {{ check.status }} | {{ check.get('statistic')|number }} | {{ check.get('p_value')|pvalue }} | {{ check.get('detail', '') }} |
+{% endfor %}
+
+{% for check in health if check.get('observed') %}
+**{{ check.get('scope', check.get('kind', 'allocation')) }} allocation:** conventional verdict **{{ check.get('conventional_verdict', check.status) }}**{% if check.get('warn_threshold') %} at {{ check.warn_threshold|pvalue }}{% endif %}; platform verdict **{{ check.get('blocking_verdict', check.status) }}**{% if check.get('block_threshold') %} at {{ check.block_threshold|pvalue }}{% endif %}.
+
+| Variant | Observed units | Expected units |
+| --- | ---: | ---: |
+{% for variant, count in check.observed.items() %}
+| {{ variant }} | {{ count }} | {{ check.get('expected', {}).get(variant)|number(1) }} |
+{% endfor %}
+
+{% endfor %}
+{% for check in health if check.get('check') == 'exposure' %}
+{% if experiment.source == 'public' %}
+Analysis inclusion: {{ check.get('fraction')|percent }} of assigned players. Actual gate exposure was not observed; this is an assignment-effect analysis.
+{% else %}
+Exposure coverage: {{ check.get('fraction')|percent }}. {% for arm, fraction in check.get('by_arm', {}).items() %}{{ arm }} {{ fraction|percent }}. {% endfor %}
+{% endif %}
+{% endfor %}
+{% for check in health if check.get('check') == 'missingness' %}
+Missing {{ check.get('metric_key') }}: {% for arm, fraction in check.get('by_arm', {}).items() %}{{ arm }} {{ fraction|percent }}. {% endfor %}
 {% endfor %}
 
 ## Design
@@ -30,49 +54,77 @@ The analysis remains tied to the original registered design; subsequent changes 
 No changes to the registered design were recorded.
 {% endif %}
 
-```json
-{{ design|json }}
-```
+| Registered parameter | Value |
+| --- | --- |
+| Primary metric | {{ design.get('primary_metric_key', 'unavailable') }} |
+| Baseline | {{ design.get('baseline')|number }} |
+| Relative MDE | {{ design.get('mde_relative')|percent }} |
+| Alpha | {{ design.get('alpha')|percent }} |
+| Requested power | {{ design.get('power')|percent }} |
+| Planned units per arm | {{ design.get('planned_n_per_arm') }} |
+| Planned days | {{ design.get('planned_days', 'unavailable') }} |
+| Mixing variance | {{ design.get('mixing_variance')|number }} |
+{% for variant in design.get('variants', []) %}
+| {{ variant.name }} allocation | {{ variant.allocation|percent }} |
+{% endfor %}
+
+| Metric | Type | Favorable direction | Winsorization policy |
+| --- | --- | --- | --- |
+{% for metric in design.get('metrics', []) %}
+| {{ metric.name }} | {{ metric.kind }} | {{ metric.get('direction', 'higher_is_better') }} | {{ metric.winsor_upper_percentile|percent if metric.get('winsor_upper_percentile') else 'none' }} |
+{% endfor %}
 
 {% if not blocked %}
 ## Primary metric
 
 {% set primary = results.get('primary') or {} %}
+Intervals use the registered confidence level of {{ (1 - design.get('alpha', 0.05))|percent }}. Absolute effects are in metric units; relative effects are percent lift.
+
 | Metric | Absolute effect and interval | Relative effect and interval | p-value | Control units | Treatment units |
 | --- | --- | --- | ---: | ---: | ---: |
-| {{ primary.get('name', primary.get('key', 'unavailable')) }} | {{ primary|interval }} | {{ primary|interval(true) }} | {{ primary.get('p_value')|number(6) }} | {{ primary.get('n_control') }} | {{ primary.get('n_treatment') }} |
+| {{ primary.get('name', primary.get('key', 'unavailable')) }} | {{ primary|interval }} | {{ primary|interval(true) }} | {{ primary.get('p_value')|pvalue }} | {{ primary.get('n_control') }} | {{ primary.get('n_treatment') }} |
 
-Registered relative MDE: {{ design.get('mde_relative')|percent }}. Planned sample per arm: {{ design.get('planned_n_per_arm') }}. Design alpha: {{ design.get('alpha')|percent }}. Requested power: {{ design.get('power')|percent }}.
-
+Standard error: {{ primary.get('se')|number }}. Method: {{ primary.get('method', 'unavailable') }}.
+{% if primary.get('design_effect_projected_power') is not none %}
+Projected power at the registered effect and achieved sample: {{ primary.get('design_effect_projected_power')|percent }}. This is a design projection, not observed-effect evidence.
+{% endif %}
 {% if primary.get('bootstrap') %}
-Bootstrap cross-check: {{ primary.bootstrap|tojson }}.
-{% elif results.get('bootstrap') %}
-Bootstrap cross-check: {{ results.bootstrap|tojson }}.
+Unit bootstrap cross check: {{ primary.bootstrap|interval }}. Resamples: {{ primary.bootstrap.get('draws') }}; seed: {{ primary.bootstrap.get('seed') }}.
 {% endif %}
-{% if primary.get('unadjusted') %}
-Without the declared outlier policy: {{ primary.unadjusted|interval }}.
-{% endif %}
+{% for raw in results.get('raw_metrics', []) if raw.key == primary.get('key') %}
+Without the declared outlier policy: {{ raw|interval }}; relative {{ raw|interval(true) }}.
+{% endfor %}
 
 ## Guardrails
 
-| Metric | Absolute effect and interval | Non-inferiority margin | Verdict |
-| --- | --- | ---: | --- |
+| Metric | Absolute effect and interval | Relative effect and interval | Margin | Verdict | One-sided p-value |
+| --- | --- | --- | ---: | --- | ---: |
 {% for metric in results.get('guardrails', []) %}
-| {{ metric.get('name', metric.get('key')) }} | {{ metric|interval }} | {{ metric.get('margin', metric.get('margin_relative')) }} | {{ 'pass' if metric.get('passed') else 'fail' }} |
-{% if metric.get('unwinsorized') %}
-| {{ metric.get('name', metric.get('key')) }} without winsorization | {{ metric.unwinsorized|interval }} | sensitivity row | descriptive |
-{% endif %}
+| {{ metric.get('name', metric.get('key')) }} | {{ metric|interval }} | {{ metric|interval(true) }} | {{ metric.get('margin')|percent }} | {{ 'pass' if metric.get('passed') else 'fail' }} | {{ metric.get('noninferiority_p_value')|pvalue }} |
+{% for raw in results.get('raw_metrics', []) if raw.key == metric.key %}
+| {{ metric.get('name', metric.get('key')) }} without winsorization | {{ raw|interval }} | {{ raw|interval(true) }} | same registered margin | sensitivity only | not a separate decision |
+{% endfor %}
 {% endfor %}
 
 {% if not results.get('guardrails') %}
 No guardrails were registered for this scenario.
+{% else %}
+Pass means the one-sided interval excludes degradation beyond the registered margin. Fail includes insufficient evidence of safety as well as demonstrated harm. Displayed two-sided effect intervals provide context; the verdict uses the one-sided test.
 {% endif %}
+{% for metric in results.get('metrics', []) if metric.get('outlier_policy', {}).get('threshold') is not none %}
+{{ metric.name }} uses a pooled upper threshold of {{ metric.outlier_policy.threshold|number }}. The threshold is estimated from these outcomes; the analytic interval conditions on that threshold.
+{% endfor %}
 
 ## Variance
 
 {% set cuped = results.get('cuped', {}) %}
 {% if cuped.get('applicable') %}
-{{ cuped|tojson }}
+| Estimator | Effect and interval | Standard error |
+| --- | --- | ---: |
+| Unadjusted | {{ cuped.unadjusted|interval }} | {{ cuped.unadjusted.se|number }} |
+| CUPED adjusted | {{ cuped.adjusted|interval }} | {{ cuped.adjusted.se|number }} |
+
+Descriptive variance reduction: {{ cuped.get('variance_reduction')|percent }}. Equivalent sample multiplier: {{ cuped.get('equivalent_sample_multiplier')|number(2) }}. Equivalent units saved: {{ cuped.get('n_saved')|number(0) }}. These are variance-model planning equivalents, not additional observed users. The decision uses the registered unadjusted primary. {{ cuped.get('limitation', '') }}
 {% else %}
 CUPED not applicable: {{ cuped.get('reason', 'No pre-period covariate was supplied.') }}
 {% endif %}
@@ -81,11 +133,16 @@ CUPED not applicable: {{ cuped.get('reason', 'No pre-period covariate was suppli
 
 {% set sequential = results.get('sequential', {}) %}
 {% if sequential.get('applicable') %}
-Normal-mixture mSPRT with estimated variance. This is an asymptotic approximation; calibration supports only the simulated regimes that were measured. Mixing variance: {{ design.get('mixing_variance') }}.
+Normal-mixture mSPRT with estimated variance. This is an asymptotic approximation; calibration supports only the simulated regimes that were measured. Mixing variance: {{ design.get('mixing_variance')|number }}.
 
-First sequential rejection day: {{ sequential.get('first_rejection_day', 'none') }}.
+First sequential rejection day: {{ sequential.get('first_rejection_day') or 'none' }}. First naive rejection day: {{ sequential.get('naive_first_rejection_day') or 'none' }}.
 {% if sequential.get('points') %}
-Final monitor state: {{ sequential.points[-1]|tojson }}
+{% set last = sequential.points[-1] %}
+
+| Final day | Method | Effect | Interval | p-value |
+| ---: | --- | ---: | --- | ---: |
+| {{ last.day }} | Sequential monitor | {{ last.estimate|number }} | [{{ last.ci_low|number }}, {{ last.ci_high|number }}] | {{ last.p_value|pvalue }} |
+| {{ last.day }} | Naive daily comparison | {{ last.estimate|number }} | [{{ last.naive_low|number }}, {{ last.naive_high|number }}] | {{ last.naive_p_value|pvalue }} |
 {% endif %}
 {% else %}
 Sequential monitoring not applicable: {{ sequential.get('reason', 'No valid observation timestamps were supplied.') }}
@@ -93,12 +150,15 @@ Sequential monitoring not applicable: {{ sequential.get('reason', 'No valid obse
 
 ## Secondary and segments
 
-These are exploratory comparisons. Adjusted p-values are Benjamini-Hochberg corrections within the declared comparison family. Pointwise intervals are not simultaneous confidence intervals.
+These are exploratory comparisons. Adjusted p-values are Benjamini-Hochberg corrections within separate secondary-metric and segment families. Pointwise intervals are not simultaneous confidence intervals.
 
 | Comparison | Effect and interval | Raw p-value | Adjusted p-value | Raw verdict | Corrected verdict |
 | --- | --- | ---: | ---: | --- | --- |
 {% for metric in results.get('secondary', []) + results.get('segments', []) %}
-| {{ metric.get('name', metric.get('key', metric.get('segment', 'comparison'))) }} | {{ metric|interval }} | {{ metric.get('p_value')|number(6) }} | {{ metric.get('q_value', metric.get('adjusted_p_value'))|number(6) }} | {{ metric.get('significant', metric.get('uncorrected_significant')) }} | {{ metric.get('significant_adjusted', metric.get('corrected_significant')) }} |
+| {% if metric.get('segment') %}Segment {{ metric.segment }}: {% endif %}{{ metric.get('name', metric.get('key', 'comparison')) }} | {{ metric|interval }} | {{ metric.get('p_value')|pvalue }} | {{ metric.get('p_adjusted')|pvalue }} | {{ 'significant' if metric.get('significant') else 'not significant' }} | {{ 'significant' if metric.get('significant_adjusted') else 'not significant' }} |
+{% endfor %}
+{% for missing in results.get('unavailable_metrics', []) %}
+Unavailable exploratory metric: {{ missing }}.
 {% endfor %}
 {% else %}
 Analysis stopped at the health gate. No metric results were produced.
@@ -108,6 +168,10 @@ Analysis stopped at the health gate. No metric results were produced.
 
 **{{ decision.get('decision', results.get('decision', {}).get('decision', 'blocked'))|upper }}**
 
+{% if results.get('decision', {}).get('provisional') %}
+**PROVISIONAL: the registered sample horizon has not been reached.** This current fixed-horizon recommendation cannot authorize a launch. Achieved units in the smaller arm: {{ results.decision.get('achieved_n_per_arm') }}; planned units per arm: {{ results.decision.get('planned_n_per_arm') }}.
+{% endif %}
+
 {{ results.get('decision', {}).get('reason', decision.get('reason', '')) }}
 
 Registered rule:
@@ -115,7 +179,7 @@ Registered rule:
 > {{ design.get('decision_rule', {}).get('text', results.get('decision', {}).get('rule', 'No registered rule available.')) }}
 
 {% if results.get('decision', {}).get('additional_n_per_arm') %}
-Additional sample per arm at the registered MDE: {{ results.decision.additional_n_per_arm }}. This is a planning projection, not guaranteed future significance.
+Additional sample per arm from the extension planning heuristic: {{ results.decision.additional_n_per_arm }}. This is not guaranteed future significance; register a new horizon or use the sequential policy.
 {% endif %}
 
 ## Limitations
