@@ -1,0 +1,19 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen
+      - run: uv run python -m scripts.check_published_numbers
+      - run: uv run python -m scripts.check_no_em_dash
+      - run: uv build --all-packages
+      - run: gh release create "$GITHUB_REF_NAME" dist/* --title "readout $GITHUB_REF_NAME" --notes-file docs/release-notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}
