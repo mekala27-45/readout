@@ -2,6 +2,8 @@
 name = "readout"
 version = "0.1.0"
 description = "Health-first experimentation with independently calibrated statistical decisions"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md"]
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "readout-core", "readout-assign", "readout-sim", "readout-stats",
