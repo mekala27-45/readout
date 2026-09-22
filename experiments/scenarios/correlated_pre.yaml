@@ -1,0 +1,58 @@
+scenario: correlated_pre
+source: simulated
+seed: 20260922
+truth:
+  name: Correlated pre-period
+  effect: 0.4
+  rho: 0.8
+  n_per_arm: 1500
+  description: A pre-period covariate predicts outcome variation; theoretical reduction
+    is rho squared.
+design:
+  primary_metric_key: value
+  metrics:
+  - key: value
+    name: Value per exposed unit
+    kind: mean
+    direction: higher_is_better
+    guardrail_margin_relative: null
+    winsor_upper_percentile: null
+  - key: quality
+    name: Quality score
+    kind: mean
+    direction: higher_is_better
+    guardrail_margin_relative: 0.05
+    winsor_upper_percentile: null
+  - key: retained
+    name: Retention
+    kind: proportion
+    direction: higher_is_better
+    guardrail_margin_relative: null
+    winsor_upper_percentile: null
+  guardrail_metric_keys:
+  - quality
+  secondary_metric_keys:
+  - retained
+  variants:
+  - name: control
+    allocation: 0.5
+  - name: treatment
+    allocation: 0.5
+  alpha: 0.05
+  power: 0.8
+  mde_relative: 0.04
+  baseline: 10.0
+  standard_deviation: 3.0
+  planned_n_per_arm: 883
+  planned_days: 30
+  mixing_variance: 0.16
+  decision_rule:
+    text: Blocked health blocks analysis. A failing guardrail gives no_ship. Otherwise
+      ship when the primary interval excludes zero in the good direction. Otherwise
+      no_ship when the interval excludes the MDE in the good direction. Otherwise
+      extend using the design calculator. Guardrail, ship, futility, extend is the
+      precedence.
+  bootstrap_seed: 20260922
+  bootstrap_resamples: 400
+  has_timestamps: true
+  fdr_q: 0.05
