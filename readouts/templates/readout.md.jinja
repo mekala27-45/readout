@@ -9,12 +9,12 @@ Analysis recorded: {{ run.ran_at }}. Input fingerprint: `{{ run.get('inputs_hash
 
 ## Health
 
-The conventional SRM threshold warns; the stricter platform threshold blocks. Both outcomes remain visible. A warning permits analysis with a qualification.
+A p-value below the conventional SRM threshold triggers a warning; a p-value below the stricter platform threshold blocks analysis. Both outcomes remain visible. A warning permits analysis with a qualification.
 
 | Check | Status | Statistic | p-value | Details |
 | --- | --- | ---: | ---: | --- |
 {% for check in health %}
-| {{ check.get('kind', check.get('check', 'health')) }}{% if check.get('metric_key') %}: {{ check.metric_key }}{% endif %} | {{ check.status }} | {{ check.get('statistic')|number }} | {{ check.get('p_value')|pvalue }} | {{ check.get('detail', '') }} |
+| {{ check.get('kind', check.get('check', 'health')) }}{% if check.get('metric_key') %}: {{ check.metric_key }}{% endif %} | {{ check.status }} | {{ check.get('statistic')|number }} | {{ check.get('p_value')|pvalue }} | {% if experiment.source == 'public' and check.get('check', check.get('kind')) == 'exposure' %}Actual gate exposure is unobserved. All assigned players are included; the reported coverage is an analysis inclusion flag.{% else %}{{ check.get('detail', '') }}{% endif %} |
 {% endfor %}
 
 {% for check in health if check.get('observed') %}
@@ -171,7 +171,7 @@ Analysis stopped at the health gate. No metric results were produced.
 **{{ decision.get('decision', results.get('decision', {}).get('decision', 'blocked'))|upper }}**
 
 {% if results.get('decision', {}).get('provisional') %}
-**PROVISIONAL: the registered sample horizon has not been reached.** This current fixed-horizon recommendation cannot authorize a launch. Achieved units in the smaller arm: {{ results.decision.get('achieved_n_per_arm') }}; planned units per arm: {{ results.decision.get('planned_n_per_arm') }}.
+**PROVISIONAL: the registered sample horizon has not been reached.** This current fixed-horizon recommendation cannot authorize a launch. Achieved units: {{ results.primary.get('n_control') }} control / {{ results.primary.get('n_treatment') }} treatment. Registered targets: {{ results.decision.get('planned_n_by_arm', {}).get('control', results.decision.get('planned_n_per_arm')) }} control / {{ results.decision.get('planned_n_by_arm', {}).get('treatment', results.decision.get('planned_n_per_arm')) }} treatment.
 {% endif %}
 
 {{ results.get('decision', {}).get('reason', decision.get('reason', '')) }}
