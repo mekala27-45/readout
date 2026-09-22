@@ -1,0 +1,10 @@
+{
+  "source_url": "https://www.kaggle.com/datasets/mursideyarkin/mobile-games-ab-testing-cookie-cats",
+  "download_url": "https://www.kaggle.com/api/v1/datasets/download/mursideyarkin/mobile-games-ab-testing-cookie-cats",
+  "retrieved_at": "2026-09-22T15:14:28.059482+00:00",
+  "source_version": 1,
+  "license_as_listed": "Other (specified in description)",
+  "license_note": "The description credits DataCamp and Tactile Entertainment but states no additional license grant. The data is not covered by this repository's Apache license.",
+  "sha256": "5ab54d761fbddcd50de7b88e4eaf7837cba4569474f50c043a4d17ee342c46bd",
+  "bytes": 2707297
+}
