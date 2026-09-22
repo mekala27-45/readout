@@ -14,8 +14,10 @@ def assign(experiment: Mapping[str, Any], unit_id: str) -> dict[str, Any]:
     key = str(experiment["key"])
     salt = str(experiment["salt"])
     design = experiment.get("design", experiment)
-    variants = design.get("variants", [{"name": "control", "allocation": 0.5},
-                                        {"name": "treatment", "allocation": 0.5}])
+    variants = design.get(
+        "variants",
+        [{"name": "control", "allocation": 0.5}, {"name": "treatment", "allocation": 0.5}],
+    )
     treatment = next(float(v["allocation"]) for v in variants if v["name"] == "treatment")
     digest = hashlib.sha256(f"{salt}:{key}:{unit_id}".encode()).hexdigest()
     bucket = int(digest[:8], 16) % 10_000
