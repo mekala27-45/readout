@@ -33,7 +33,7 @@ The Pages workflow uses the repository base path, publishes the committed bundle
 
 ## Fly and Neon
 
-The checked-in Fly configuration requires an existing app, a Neon Postgres connection string, a non-default write token and verified no-cost hosting allowance. Set those secrets in the provider's secret store, never in Git. Apply `uv run alembic -c packages/api/alembic.ini upgrade head` to the selected database. Load canonical experiments through a deliberate seed operation against that named database, then verify `/healthz`, `/api/bundle`, assignment and upload from a separate client.
+The checked-in Fly configuration requires an existing app, a Neon Postgres connection string, a non-default write token and verified no-cost hosting allowance. Set those secrets in the provider's secret store, never in Git. Apply `uv run alembic -c packages/api/alembic.ini upgrade head` to the selected database. Seed canonical experiments with `uv run python -m scripts.seed_database --database-url "$DATABASE_URL"` in a POSIX shell, or substitute `$env:DATABASE_URL` in PowerShell. The seed command refuses a nonempty target and preserves the original evidence records. Verify `/healthz`, `/api/bundle`, assignment and upload from a separate client.
 
 Public API deployment is not claimed by this build unless separately verified. No Fly or Neon project configuration was provided in the workspace. Fly's current [cost-management documentation](https://fly.io/docs/about/cost-management/) states that it has no general free account or free tier. The deployment workflow therefore requires an explicit existing allowance attestation and will not create billable resources automatically. Neon credentials and account access were not fabricated.
 

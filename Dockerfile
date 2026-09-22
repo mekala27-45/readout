@@ -8,4 +8,4 @@ COPY scripts ./scripts
 RUN uv sync --frozen
 COPY . .
 EXPOSE 8000
-CMD ["uv", "run", "uvicorn", "readout_api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "python", "-m", "scripts.start_api"]
