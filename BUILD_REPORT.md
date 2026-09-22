@@ -18,9 +18,12 @@ readout/
   Dockerfile
   LICENSE
   Makefile
+  NOTICE
   README.md
   RESULTS.md
+  THIRD_PARTY_NOTICES.md
   artifacts/coverage.xml
+  artifacts/deployment.json
   artifacts/evidence.sql.gz
   artifacts/palette-validation.json
   artifacts/pytest-junit.xml

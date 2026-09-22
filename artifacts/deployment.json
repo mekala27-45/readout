@@ -1,0 +1,68 @@
+{
+  "verified_at": "2026-09-22T16:06:55.443359+00:00",
+  "url": "https://mekala27-45.github.io/readout/",
+  "application_revision": "42bbe83f28629528cab026ce66eb68bd0ce6f164",
+  "validation_run": "https://github.com/mekala27-45/readout/actions/runs/35751303634",
+  "pages_run": "https://github.com/mekala27-45/readout/actions/runs/35751550272",
+  "routes": [
+    {
+      "path": "/",
+      "status": 200,
+      "bytes": 9513
+    },
+    {
+      "path": "experiments/",
+      "status": 200,
+      "bytes": 10014
+    },
+    {
+      "path": "experiments/cookie_cats/",
+      "status": 200,
+      "bytes": 10898
+    },
+    {
+      "path": "calibration/",
+      "status": 200,
+      "bytes": 10149
+    },
+    {
+      "path": "design/",
+      "status": 200,
+      "bytes": 13284
+    },
+    {
+      "path": "assign/",
+      "status": 200,
+      "bytes": 11766
+    },
+    {
+      "path": "upload/",
+      "status": 200,
+      "bytes": 12196
+    },
+    {
+      "path": "results/bundle.json",
+      "status": 200,
+      "bytes": 974398
+    },
+    {
+      "path": "readouts/cookie_cats.md",
+      "status": 200,
+      "bytes": 7684
+    },
+    {
+      "path": "readouts/cookie_cats.html",
+      "status": 200,
+      "bytes": 11860
+    }
+  ],
+  "bundle_sha256": "a821c65e155cfa88f3e94910592573067711a67e9817ebdd717d8a6697ba3353",
+  "bundle_matches_committed_evidence": true,
+  "browser": {
+    "registry": "pass",
+    "cookie_cats_health_and_decision": "pass",
+    "calibration": "pass",
+    "console_errors": 0
+  },
+  "public_api": "not deployed; existing no-cost Fly allowance and Neon configuration unavailable"
+}
