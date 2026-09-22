@@ -1,0 +1,67 @@
+[project]
+name = "readout"
+version = "0.1.0"
+description = "Health-first experimentation with independently calibrated statistical decisions"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "readout-core", "readout-assign", "readout-sim", "readout-stats",
+  "readout-calibrate", "readout-render", "readout-api",
+  "numpy>=2.2", "scipy>=1.15", "polars>=1.25", "statsmodels>=0.14",
+  "pydantic>=2.10", "sqlmodel>=0.0.24", "sqlalchemy>=2.0", "fastapi>=0.115",
+  "uvicorn>=0.34", "python-multipart>=0.0.20", "structlog>=25.1",
+  "alembic>=1.15", "psycopg[binary]>=3.2", "jinja2>=3.1", "markdown>=3.7",
+  "httpx>=0.28", "pyyaml>=6.0", "typer>=0.16",
+]
+
+[project.scripts]
+readout = "readout_render.cli:app"
+
+[tool.uv.workspace]
+members = ["packages/*"]
+
+[tool.uv.sources]
+readout-core = { workspace = true }
+readout-assign = { workspace = true }
+readout-sim = { workspace = true }
+readout-stats = { workspace = true }
+readout-calibrate = { workspace = true }
+readout-render = { workspace = true }
+readout-api = { workspace = true }
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-cov>=6", "pytest-asyncio>=0.26", "hypothesis>=6.130", "ruff>=0.11", "mypy>=1.15", "testcontainers[postgres]>=4.10", "types-PyYAML", "types-Markdown", "pillow>=11", "asgi-lifespan>=2.1"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = ["web", "artifacts", ".cache"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["packages"]
+ignore_missing_imports = true
+explicit_package_bases = true
+mypy_path = ["packages/core/src", "packages/assign/src", "packages/sim/src", "packages/stats/src", "packages/calibrate/src", "packages/render/src", "packages/api/src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = ["external: requires a probed external executable", "postgres: requires independently probed Docker Postgres", "calibration: seeded Monte Carlo validation"]
+
+[tool.coverage.run]
+source = ["readout_core", "readout_assign", "readout_sim", "readout_stats", "readout_calibrate", "readout_render", "readout_api"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["scripts"]
