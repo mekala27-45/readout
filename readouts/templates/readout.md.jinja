@@ -31,11 +31,11 @@ A p-value below the conventional SRM threshold triggers a warning; a p-value bel
 {% if experiment.source == 'public' %}
 Analysis inclusion: {{ check.get('fraction')|percent }} of assigned players. Actual gate exposure was not observed; this is an assignment-effect analysis.
 {% else %}
-Exposure coverage: {{ check.get('fraction')|percent }}. {% for arm, fraction in check.get('by_arm', {}).items() %}{{ arm }} {{ fraction|percent }}. {% endfor %}
+Exposure coverage: {{ check.get('fraction')|percent }}. Control {{ check.get('by_arm', {}).get('control')|percent }}; treatment {{ check.get('by_arm', {}).get('treatment')|percent }}.
 {% endif %}
 {% endfor %}
 {% for check in health if check.get('check') == 'missingness' %}
-Missing {{ check.get('metric_key') }}: {% for arm, fraction in check.get('by_arm', {}).items() %}{{ arm }} {{ fraction|percent }}. {% endfor %}
+Missing {{ check.get('metric_key') }}: control {{ check.get('by_arm', {}).get('control')|percent }}; treatment {{ check.get('by_arm', {}).get('treatment')|percent }}.
 {% endfor %}
 
 ## Design

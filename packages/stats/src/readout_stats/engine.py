@@ -143,14 +143,9 @@ def analyze(
             int(design.get("bootstrap_seed", 20260922)),
             int(design.get("bootstrap_resamples", 400)),
         )
-        allocation = next(
-            (
-                float(variant["allocation"])
-                for variant in design.get("variants", [])
-                if variant["name"] == "treatment"
-            ),
-            0.5,
-        )
+        # Project power at the registered effect using both achieved arm counts.
+        # The planned allocation does not describe a realized imbalance.
+        allocation = primary["n_treatment"] / (primary["n_control"] + primary["n_treatment"])
         primary["design_effect_projected_power"] = achieved_power(
             primary["n_control"],
             design["baseline"],

@@ -88,6 +88,35 @@ def test_welch_crosscheck_statsmodels():
     assert result["df"] == pytest.approx(df)
 
 
+def test_projected_power_uses_both_achieved_arm_counts():
+    design = design_for("null")
+    rows = [
+        {
+            "unit_id": f"{variant}-{i}",
+            "variant": variant,
+            "exposed": True,
+            "day": 1,
+            "segment": "all",
+            "metrics": {
+                "value": float(10 + i % 7 - 3),
+                "quality": float(100 + i % 3),
+                "retained": float(i % 2),
+            },
+            "pre": {},
+            "denominators": {},
+        }
+        for variant, count in [("control", 110), ("treatment", 90)]
+        for i in range(count)
+    ]
+    result = analyze(design, rows, check_health(design, rows))
+    independent = NormalIndPower().power(effect_size=0.4 / 3, nobs1=110, alpha=0.05, ratio=90 / 110)
+    assert result["primary"]["design_effect_projected_power"] == pytest.approx(independent)
+    balanced_projection = NormalIndPower().power(
+        effect_size=0.4 / 3, nobs1=110, alpha=0.05, ratio=1
+    )
+    assert result["primary"]["design_effect_projected_power"] < balanced_projection
+
+
 @given(
     st.lists(
         st.floats(min_value=-1e3, max_value=1e3, allow_nan=False, allow_infinity=False),
