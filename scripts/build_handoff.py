@@ -116,7 +116,7 @@ def main() -> None:
     )
     report = "\n".join(lines)
     (ROOT / "BUILD_REPORT.md").write_text(report, encoding="utf-8", newline="\n")
-    (ROOT / "docs/tree.txt").write_text("readout/\n" + tree + "\n", encoding="utf-8")
+    (ROOT / "docs/tree.txt").write_text("readout/\n" + tree + "\n", encoding="utf-8", newline="\n")
     final = calibration["peeking"][-1]
     post = f"# LinkedIn draft: calibration first\n\nI ran {final['naive']['total']:,} simulated A/B tests with no difference between groups and checked them daily for {final['day']} days. Naive testing called a winner in {percent(final['naive']['rate'], 1)} of experiments. A calibrated normal-mixture sequential method rejected in {percent(final['sequential']['rate'], 1)}.\n\nThose simulation results, with uncertainty intervals, are published alongside the code. The sequential implementation uses an estimated-variance approximation, so the measured regimes and its limits are stated explicitly.\n\nThe platform also checks randomization health before analyzing a metric, freezes experiment designs, tests guardrails, and renders a decision document from stored records. Its public Cookie Cats readout explains exactly what the dataset can and cannot support.\n\nhttps://mekala27-45.github.io/readout/\n\nhttps://github.com/mekala27-45/readout\n\nDraft only; not posted.\n"
     (ROOT / "docs/linkedin-draft.md").write_text(post, encoding="utf-8", newline="\n")
