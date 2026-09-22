@@ -27,6 +27,7 @@ SUFFIXES = {
     ".json",
     ".js",
     ".mjs",
+    ".cjs",
     ".ts",
     ".tsx",
     ".css",
@@ -41,10 +42,14 @@ SUFFIXES = {
 def check(root: Path) -> list[str]:
     if not root.exists():
         raise ValueError("No files to check")
-    files = []
+    files: list[Path] = []
     for directory, subdirectories, names in os.walk(root):
         subdirectories[:] = [name for name in subdirectories if name not in SKIP]
-        files.extend(Path(directory) / name for name in names if Path(name).suffix in SUFFIXES)
+        files.extend(
+            Path(directory) / name
+            for name in names
+            if Path(name).suffix in SUFFIXES or name in {"Makefile", "Dockerfile", "LICENSE"}
+        )
     if not files:
         raise ValueError("No text files to check")
     errors = []

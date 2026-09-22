@@ -15,19 +15,36 @@ def main() -> None:
     draw = ImageDraw.Draw(image)
     font_path = Path("C:/Windows/Fonts/consola.ttf")
 
-    def font(size: int) -> ImageFont.FreeTypeFont:
-        return ImageFont.truetype(str(font_path), size) if font_path.exists() else ImageFont.load_default(size=size)
+    def font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+        return (
+            ImageFont.truetype(str(font_path), size)
+            if font_path.exists()
+            else ImageFont.load_default(size=size)
+        )
 
     draw.rounded_rectangle((54, 53, 68, 90), radius=5, fill="#0891B2")
     draw.text((87, 45), "readout", font=font(48), fill="#FAFAFA")
     draw.text((58, 157), "Health first.", font=font(66), fill="#FAFAFA")
     draw.text((58, 231), "Evidence before decisions.", font=font(55), fill="#94A3B8")
-    for x, label, data, color in [(60, "NAIVE DAILY PEEKING", final["naive"], "#94A3B8"), (630, "SEQUENTIAL MONITORING", final["sequential"], "#67E8F9")]:
+    for x, label, data, color in [
+        (60, "NAIVE DAILY PEEKING", final["naive"], "#94A3B8"),
+        (630, "SEQUENTIAL MONITORING", final["sequential"], "#67E8F9"),
+    ]:
         draw.line((x, 342, x + 500, 342), fill="#334155", width=2)
         draw.text((x, 363), label, font=font(21), fill="#CBD5E1")
         draw.text((x, 404), f"{data['rate']:.1%}", font=font(52), fill=color)
-        draw.text((x, 470), f"95% interval [{data['low']:.1%}, {data['high']:.1%}]", font=font(21), fill="#CBD5E1")
-    draw.text((60, 567), f"SIMULATED NULL  /  seed {evidence['calibration']['seed']}  /  {final['naive']['total']} experiments", font=font(20), fill="#94A3B8")
+        draw.text(
+            (x, 470),
+            f"95% interval [{data['low']:.1%}, {data['high']:.1%}]",
+            font=font(21),
+            fill="#CBD5E1",
+        )
+    draw.text(
+        (60, 567),
+        f"SIMULATED NULL  /  seed {evidence['calibration']['seed']}  /  {final['naive']['total']} experiments",
+        font=font(20),
+        fill="#94A3B8",
+    )
     image.save(ROOT / "docs/social-preview.png")
 
 
