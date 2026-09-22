@@ -1,0 +1,9 @@
+# CUPED
+
+For a pre-period covariate `X` and outcome `Y`, the engine fits one pooled coefficient `theta = covariance(X,Y) / variance(X)`. It subtracts `theta * (X - pooled_mean(X))` from each outcome, preserving an interpretable treatment-control mean difference. A constant covariate gets zero adjustment. Missing pre-period values do not get silently imputed: the panel states that the adjustment is unavailable.
+
+The within-run variance reduction is one minus the adjusted squared standard error divided by the unadjusted squared standard error. Its equivalent sample multiplier is the inverse of the remaining variance fraction. The saved-sample display is a planning equivalence under the same outcome model, not observed users who were actually saved. The primary decision continues to use the registered unadjusted primary unless an adjusted estimand was pre-registered separately.
+
+The correlated-pre study generates potential outcomes from a stated correlation and counts effect recovery across independent replicates. It also computes the empirical reduction in the variance of treatment-effect estimates across replicates, with a paired bootstrap interval. This second comparison does not rely on the engine's estimated variances. Under the simulated linear structure the target reduction is the squared pre-post correlation. Full measurements and uncertainty are rendered in RESULTS.md.
+
+Pre-period values must precede treatment and be unaffected by it. Same-sample estimation of theta has small finite-sample bias. Nonlinear relationships, missingness, shifts over time and weak covariates can reduce or reverse gains. This implementation does not claim universal efficiency. The real Cookie Cats file contains no pre-period metric, so CUPED is unavailable. [Deng, Xu, Kohavi and Walker](https://ai.stanford.edu/~ronnyk/2013-02CUPEDImprovingSensitivityOfControlledExperiments.pdf) describes the method and assumptions.
